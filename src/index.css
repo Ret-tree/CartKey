@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body { overscroll-behavior: none; background: #FAFAF5; }
+  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+  /* Dark mode base */
+  html.dark body { background: #1A1F16; color: #E8E7DF; }
+  html.dark .card-surface { background: #242920; border-color: #333D2D; }
+  html.dark input, html.dark select { background: #242920; border-color: #333D2D; color: #E8E7DF; }
+  html.dark input::placeholder { color: #5C6356; }
+}
+
+@layer components {
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* Brass accent stripe */
+  .brass-stripe { background: linear-gradient(90deg, #C9A227, #E8D48A, #C9A227); height: 2px; }
+
+  /* Card surface - warm white with subtle warmth */
+  .card-surface { background: white; border: 1px solid #E8E7DF; }
+
+  /* Key-shaped decorative element */
+  .key-accent::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #C9A227 20%, #C9A227 80%, transparent);
+  }
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+.animate-fade-in { animation: fadeIn 0.25s ease-out both; }
+.animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-pulse-slow { animation: pulse 2s ease-in-out infinite; }
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 33%, rgba(201,162,39,0.08) 50%, transparent 66%);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+

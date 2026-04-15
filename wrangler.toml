@@ -1,0 +1,16 @@
+name = "cartkey"
+compatibility_date = "2024-06-01"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cartkey-db"
+database_id = "" # Set after running: wrangler d1 create cartkey-db
+
+[[kv_namespaces]]
+binding = "COUPON_CACHE"
+id = "" # Set after running: wrangler kv:namespace create COUPON_CACHE
+
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "cartkey-assets"
