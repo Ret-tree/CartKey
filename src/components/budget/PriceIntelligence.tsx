@@ -33,7 +33,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
       <div className="px-4 pt-3 pb-2">
         <h2 className="text-xl font-bold text-forest-600 font-display mb-3">Price Intelligence</h2>
         <div className="flex gap-1 p-1 rounded-xl bg-gray-100">
-          {([['savings', '💡 Savings'], ['prices', '📈 Prices'], ['insights', '📊 Trends']] as const).map(([id, label]) => (
+          {([['savings', 'Savings'], ['prices', 'Prices'], ['insights', 'Trends']] as const).map(([id, label]) => (
             <button key={id} onClick={() => setSubView(id)}
               className="flex-1 py-2 rounded-lg text-[11px] font-semibold transition-all"
               style={{ background: subView === id ? 'white' : 'transparent', color: subView === id ? '#1B4332' : '#6B7280',
@@ -52,7 +52,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
             {missedSavings.length > 0 ? (
               <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50/50">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-semibold text-amber-700">😮 Missed Savings</p>
+                  <p className="text-xs font-semibold text-amber-700">Missed Savings</p>
                   <p className="text-sm font-bold text-amber-700">{formatCurrency(totalMissed)}</p>
                 </div>
                 <p className="text-[10px] text-amber-600 mb-3">Coupons were available for items you bought recently</p>
@@ -70,7 +70,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
               </div>
             ) : (
               <div className="p-4 rounded-2xl border border-green-200 bg-green-50/50 text-center">
-                <span className="text-2xl">🎉</span>
+                
                 <p className="text-sm font-semibold text-green-700 mt-1">No missed savings!</p>
                 <p className="text-[10px] text-green-600 mt-0.5">You're catching all available coupons</p>
               </div>
@@ -79,7 +79,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
             {/* Recommendations */}
             {recommendations.length > 0 && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-300 mb-2">Recommended For You</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">Recommended For You</p>
                 <div className="space-y-2">
                   {recommendations.map((rec) => {
                     const isClipped = clippedIds.includes(rec.couponId);
@@ -93,7 +93,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
                         <button onClick={() => onClip(rec.couponId)}
                           className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
                           style={{ background: isClipped ? '#F3F4F6' : '#ECFDF5', color: isClipped ? '#9CA3AF' : '#059669' }}>
-                          {isClipped ? '✅' : '✂️ Clip'}
+                          {isClipped ? 'Saved' : 'Clip'}
                         </button>
                       </div>
                     );
@@ -104,7 +104,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
 
             {purchases.length === 0 && recommendations.length === 0 && (
               <div className="text-center py-8">
-                <span className="text-4xl">💡</span>
+                
                 <p className="text-sm text-gray-500 mt-2">Log some purchases to see personalized savings tips</p>
               </div>
             )}
@@ -117,7 +117,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
             {/* Price alerts */}
             {priceAlerts.length > 0 && (
               <div className="p-3 rounded-xl bg-red-50 border border-red-200">
-                <p className="text-xs font-semibold text-red-600 mb-1">📈 Price Increases Detected</p>
+                <p className="text-xs font-semibold text-red-600 mb-1">Price Increases Detected</p>
                 {priceAlerts.slice(0, 3).map((a) => (
                   <p key={a.productName} className="text-[10px] text-red-500">
                     {a.productName}: +{a.changePercent.toFixed(0)}% since first purchase
@@ -128,7 +128,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
 
             {topProducts.length > 0 ? (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-300 mb-2">Your Products</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">Your Products</p>
                 <div className="space-y-2">
                   {topProducts.map((product) => {
                     const isExpanded = expandedProduct === product.productName;
@@ -186,7 +186,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
               </div>
             ) : (
               <div className="text-center py-8">
-                <span className="text-4xl">📈</span>
+                
                 <p className="text-sm text-gray-500 mt-2">Price history builds as you log purchases</p>
                 <p className="text-xs text-gray-400 mt-1">Scan receipts or log manually to start tracking</p>
               </div>
@@ -231,7 +231,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
 
             {purchases.length === 0 && (
               <div className="text-center py-8">
-                <span className="text-4xl">📊</span>
+                
                 <p className="text-sm text-gray-500 mt-2">Trends appear after logging purchases</p>
               </div>
             )}
@@ -245,7 +245,7 @@ export function PriceIntelligence({ purchases, coupons, clippedIds, onClip }: Pr
 // ─── SVG Price Chart ───
 function PriceChart({ points }: { points: { date: string; price: number }[] }) {
   if (points.length < 2) {
-    return <div className="h-12 flex items-center justify-center text-[10px] text-gray-300">Need 2+ data points for chart</div>;
+    return <div className="h-12 flex items-center justify-center text-[10px] text-gray-400">Need 2+ data points for chart</div>;
   }
 
   const W = 280, H = 60, PAD = 8;

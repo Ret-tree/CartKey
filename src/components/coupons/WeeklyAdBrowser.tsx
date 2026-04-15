@@ -68,7 +68,7 @@ export function WeeklyAdBrowser({ storeId, storeName, storeColor, profile }: Pro
       {/* Ad items */}
       {storeAds.length === 0 ? (
         <div className="text-center py-8">
-          <div className="text-3xl mb-2">📰</div>
+          
           <p className="text-sm text-gray-500">No ad items in this category</p>
         </div>
       ) : (

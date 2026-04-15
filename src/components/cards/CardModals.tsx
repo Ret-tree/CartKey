@@ -56,7 +56,7 @@ export function AddCardModal({ onAdd, onClose }: AddProps) {
         <div className="p-5 pb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-display font-bold text-forest-900">Add Loyalty Card</h3>
-            <button onClick={onClose} className="w-9 h-9 rounded-lg flex items-center justify-center bg-warm-200 text-forest-900/40 text-sm min-h-[36px]">✕</button>
+            <button onClick={onClose} className="w-9 h-9 rounded-lg flex items-center justify-center bg-warm-200 text-forest-900/55 text-sm min-h-[36px]">✕</button>
           </div>
 
           <input type="text" placeholder="Search stores…" value={search} onChange={(e) => setSearch(e.target.value)}
@@ -80,13 +80,13 @@ export function AddCardModal({ onAdd, onClose }: AddProps) {
 
           {store && rule && (
             <div className="mb-4 animate-fade-in">
-              <label className="text-[11px] font-semibold text-forest-900/40 uppercase tracking-wider">Card Number</label>
+              <label className="text-[11px] font-semibold text-forest-900/55 uppercase tracking-wider">Card Number</label>
               <input type="text" placeholder={rule.example} value={number}
                 onChange={(e) => handleInput(e.target.value)}
                 inputMode={rule.digitsOnly ? 'numeric' : 'text'}
                 className={`w-full px-4 py-3.5 rounded-lg text-base border bg-white mt-1 outline-none font-mono tracking-wider transition-colors ${error ? 'border-red-300' : 'border-warm-200 focus:border-brass-400'}`}
                 maxLength={rule.maxLength} />
-              <p className={`text-[11px] mt-1.5 ${error ? 'text-red-500' : 'text-forest-900/30'}`}>
+              <p className={`text-[11px] mt-1.5 ${error ? 'text-red-500' : 'text-forest-900/60'}`}>
                 {error || rule.hint}
               </p>
             </div>
@@ -94,7 +94,7 @@ export function AddCardModal({ onAdd, onClose }: AddProps) {
 
           {store && storeData?.supportsPhone && (
             <div className="mb-4 animate-fade-in">
-              <label className="text-[11px] font-semibold text-forest-900/40 uppercase tracking-wider">Phone Number <span className="normal-case text-forest-900/20">(optional — for PIN pad lookup)</span></label>
+              <label className="text-[11px] font-semibold text-forest-900/55 uppercase tracking-wider">Phone Number <span className="normal-case text-forest-900/55">(optional — for PIN pad lookup)</span></label>
               <input type="tel" placeholder="(555) 123-4567" value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 inputMode="tel"
@@ -138,14 +138,14 @@ export function CardDetail({ card, onClose, onDelete, isNearby }: DetailProps) {
         {/* Barcode */}
         <div className="p-5">
           <div className="p-4 rounded-xl bg-white border border-warm-200">
-            <p className="text-[10px] uppercase tracking-widest text-center mb-3 font-semibold text-forest-900/25">Scan at checkout</p>
+            <p className="text-[10px] uppercase tracking-widest text-center mb-3 font-semibold text-forest-900/60">Scan at checkout</p>
             <BarcodeDisplay value={card.cardNumber} height={70} symbology={storeData?.barcodeSymbology} />
           </div>
 
           {/* Phone number */}
           {card.phoneNumber && storeData?.supportsPhone && (
             <div className="mt-3 p-3 rounded-xl bg-warm-100 border border-warm-200">
-              <p className="text-[10px] uppercase tracking-widest font-semibold text-forest-900/25 mb-1">PIN Pad Lookup</p>
+              <p className="text-[10px] uppercase tracking-widest font-semibold text-forest-900/60 mb-1">PIN Pad Lookup</p>
               <p className="text-lg font-mono font-bold text-forest-900 tracking-wider text-center">
                 {card.phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}
               </p>

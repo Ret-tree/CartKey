@@ -51,7 +51,7 @@ export function OnboardingFlow({ onComplete }: Props) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-warm-50">
+    <div className="h-full flex flex-col bg-warm-50 safe-top safe-bottom">
       {/* Progress indicator */}
       {step > 0 && (
         <div className="px-6 pt-4 pb-2">
@@ -89,7 +89,7 @@ export function OnboardingFlow({ onComplete }: Props) {
             className="mt-10 w-full max-w-[280px] py-4 bg-forest-900 text-brass-100 font-semibold rounded-xl text-base tracking-wide active:scale-[0.97] transition-transform shadow-lg shadow-forest-900/20">
             Get Started
           </button>
-          <button onClick={finish} className="mt-4 text-sm text-forest-900/30 font-medium">
+          <button onClick={finish} className="mt-4 text-sm text-forest-900/50 font-medium">
             Skip — explore on my own
           </button>
         </div>
@@ -100,7 +100,7 @@ export function OnboardingFlow({ onComplete }: Props) {
         <div className="flex-1 flex flex-col px-6 pt-2 animate-fade-in">
           <p className="text-xs font-semibold text-brass-500 tracking-widest uppercase">Step 1 of 3</p>
           <h2 className="text-2xl font-display font-bold text-forest-900 mt-1">Your first card</h2>
-          <p className="text-sm text-forest-900/40 mt-1 mb-4">Select a store, then enter your loyalty number.</p>
+          <p className="text-sm text-forest-900/55 mt-1 mb-4">Select a store, then enter your loyalty number.</p>
 
           <input type="text" placeholder="Search stores…" value={storeSearch} onChange={(e) => setStoreSearch(e.target.value)}
             className="w-full px-4 py-3 rounded-lg text-sm border border-warm-200 bg-white outline-none focus:border-brass-400 transition-colors mb-3 font-sans" />
@@ -124,20 +124,20 @@ export function OnboardingFlow({ onComplete }: Props) {
 
           {cardStore && rule && (
             <div className="mb-3 animate-fade-in">
-              <label className="text-[11px] font-semibold text-forest-900/40 uppercase tracking-wider">Card Number</label>
+              <label className="text-[11px] font-semibold text-forest-900/55 uppercase tracking-wider">Card Number</label>
               <input type="text" placeholder={rule.example} value={cardNumber}
                 onChange={(e) => handleCardInput(e.target.value)}
                 inputMode={rule.digitsOnly ? 'numeric' : 'text'}
                 className={`w-full px-4 py-3.5 rounded-lg text-base border bg-white mt-1 outline-none font-mono tracking-wider transition-colors ${cardError ? 'border-red-300 focus:border-red-400' : 'border-warm-200 focus:border-brass-400'}`}
                 maxLength={rule.maxLength} />
-              <p className={`text-[11px] mt-1.5 ${cardError ? 'text-red-500' : 'text-forest-900/30'}`}>
+              <p className={`text-[11px] mt-1.5 ${cardError ? 'text-red-500' : 'text-forest-900/60'}`}>
                 {cardError || rule.hint}
               </p>
             </div>
           )}
 
           <div className="flex gap-3 mt-auto pb-3">
-            <button onClick={() => setStep(0)} className="flex-1 py-3.5 rounded-lg text-sm font-semibold text-forest-900/40 bg-warm-100 min-h-[48px]">Back</button>
+            <button onClick={() => setStep(0)} className="flex-1 py-3.5 rounded-lg text-sm font-semibold text-forest-900/55 bg-warm-100 min-h-[48px]">Back</button>
             <button onClick={() => setStep(2)} disabled={cardStore !== '' && !cardIsValid() && cardNumber.length > 0}
               className="flex-1 py-3.5 rounded-lg text-sm font-semibold text-brass-100 bg-forest-900 disabled:opacity-30 min-h-[48px] transition-opacity">
               {cardStore ? 'Next' : 'Skip this step'}
@@ -151,9 +151,9 @@ export function OnboardingFlow({ onComplete }: Props) {
         <div className="flex-1 flex flex-col px-6 pt-2 animate-fade-in">
           <p className="text-xs font-semibold text-brass-500 tracking-widest uppercase">Step 2 of 3</p>
           <h2 className="text-2xl font-display font-bold text-forest-900 mt-1">Dietary needs</h2>
-          <p className="text-sm text-forest-900/40 mt-1 mb-5">We'll filter coupons and deals to match.</p>
+          <p className="text-sm text-forest-900/55 mt-1 mb-5">We'll filter coupons and deals to match.</p>
 
-          <p className="text-[11px] font-semibold text-forest-900/50 uppercase tracking-wider mb-2">I eat</p>
+          <p className="text-[11px] font-semibold text-forest-900/60 uppercase tracking-wider mb-2">I eat</p>
           <div className="grid grid-cols-4 gap-2 mb-5">
             {DIETARY_TYPES.map((d) => (
               <button key={d.id} onClick={() => setDiet(d.id === diet ? '' : d.id)}
@@ -169,7 +169,7 @@ export function OnboardingFlow({ onComplete }: Props) {
             ))}
           </div>
 
-          <p className="text-[11px] font-semibold text-forest-900/50 uppercase tracking-wider mb-2">I avoid</p>
+          <p className="text-[11px] font-semibold text-forest-900/60 uppercase tracking-wider mb-2">I avoid</p>
           <div className="grid grid-cols-3 gap-2 mb-4">
             {ALLERGENS.map((a) => (
               <button key={a.id} onClick={() => toggleAllergen(a.id)}
@@ -186,7 +186,7 @@ export function OnboardingFlow({ onComplete }: Props) {
           </div>
 
           <div className="flex gap-3 mt-auto pb-3">
-            <button onClick={() => setStep(1)} className="flex-1 py-3.5 rounded-lg text-sm font-semibold text-forest-900/40 bg-warm-100 min-h-[48px]">Back</button>
+            <button onClick={() => setStep(1)} className="flex-1 py-3.5 rounded-lg text-sm font-semibold text-forest-900/55 bg-warm-100 min-h-[48px]">Back</button>
             <button onClick={() => setStep(3)} className="flex-1 py-3.5 rounded-lg text-sm font-semibold text-brass-100 bg-forest-900 min-h-[48px]">Next</button>
           </div>
         </div>
@@ -201,7 +201,7 @@ export function OnboardingFlow({ onComplete }: Props) {
             </svg>
           </div>
           <h2 className="text-2xl font-display font-bold text-forest-900">Enable location</h2>
-          <p className="text-sm text-forest-900/40 mt-2 max-w-[260px] leading-relaxed">
+          <p className="text-sm text-forest-900/55 mt-2 max-w-[260px] leading-relaxed">
             CartKey shows the right loyalty card automatically when you arrive at a store.
           </p>
 
@@ -209,7 +209,7 @@ export function OnboardingFlow({ onComplete }: Props) {
             className="mt-10 w-full max-w-[280px] py-4 bg-forest-900 text-brass-100 font-semibold rounded-xl text-base tracking-wide active:scale-[0.97] transition-transform shadow-lg shadow-forest-900/20">
             Enable & Finish
           </button>
-          <button onClick={finish} className="mt-4 text-sm text-forest-900/30 font-medium">Not now</button>
+          <button onClick={finish} className="mt-4 text-sm text-forest-900/50 font-medium">Not now</button>
         </div>
       )}
     </div>

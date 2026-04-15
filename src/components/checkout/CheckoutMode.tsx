@@ -88,11 +88,11 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
   return (
     <div className="fixed inset-0 z-[60] flex flex-col bg-forest-900" style={{ filter: 'brightness(1.1)' }}>
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-forest-900">
-        <button onClick={onClose} className="text-white/60 text-sm font-medium min-h-[44px] min-w-[44px] flex items-center">
+      <div className="flex items-center justify-between px-4 py-3 bg-forest-900 safe-top">
+        <button onClick={onClose} className="text-white/80 text-sm font-medium min-h-[44px] min-w-[44px] flex items-center">
           ← Back
         </button>
-        <p className="text-white/40 text-[11px] font-semibold uppercase tracking-widest">Checkout</p>
+        <p className="text-white/70 text-[11px] font-semibold uppercase tracking-widest">Checkout</p>
         <div className="min-w-[44px]" />
       </div>
 
@@ -104,7 +104,7 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
             <span className="text-2xl">{card.icon}</span>
             <div>
               <p className="text-white font-display font-bold text-xl">{card.storeName}</p>
-              <p className="text-white/40 text-xs font-mono tracking-wider">{formatCardDisplay(card.cardNumber, card.storeId)}</p>
+              <p className="text-white/70 text-xs font-mono tracking-wider">{formatCardDisplay(card.cardNumber, card.storeId)}</p>
             </div>
           </div>
 
@@ -112,12 +112,12 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
           <div className="w-full max-w-sm bg-white rounded-2xl p-6 shadow-2xl shadow-black/30">
             {!showPhone ? (
               <>
-                <p className="text-[10px] uppercase tracking-widest text-center mb-4 font-semibold text-forest-900/25">Loyalty Card</p>
+                <p className="text-[10px] uppercase tracking-widest text-center mb-4 font-semibold text-forest-900/60">Loyalty Card</p>
                 <BarcodeDisplay value={card.cardNumber} height={100} symbology={storeData?.barcodeSymbology} />
               </>
             ) : (
               <>
-                <p className="text-[10px] uppercase tracking-widest text-center mb-4 font-semibold text-forest-900/25">Enter on PIN Pad</p>
+                <p className="text-[10px] uppercase tracking-widest text-center mb-4 font-semibold text-forest-900/60">Enter on PIN Pad</p>
                 <p className="text-4xl font-mono font-bold text-forest-900 text-center tracking-widest py-4">
                   {card.phoneNumber?.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3')}
                 </p>
@@ -136,7 +136,7 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
 
           {/* Budget pill */}
           <div className="mt-6 px-4 py-2 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
-            <p className="text-white/50 text-xs">
+            <p className="text-white/70 text-xs">
               {budgetPeriodLabel}: <span className="text-brass-400 font-bold">{formatCurrency(budgetRemaining)}</span> remaining
             </p>
           </div>
@@ -163,7 +163,7 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
         <div className="flex-1 flex flex-col items-center justify-center px-6 animate-fade-in">
           {/* Counter */}
           <div className="flex items-center gap-2 mb-4">
-            <p className="text-white/40 text-xs font-semibold">
+            <p className="text-white/70 text-xs font-semibold">
               Coupon {couponIdx + 1} of {activeCoupons.length}
             </p>
           </div>
@@ -181,15 +181,15 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
             {/* Discount banner */}
             <div className="py-3 px-4 text-center" style={{ background: activeCoupons[couponIdx].discountType === 'freebie' ? '#7C3AED' : '#1B4332' }}>
               <p className="text-white font-bold text-lg">{formatDiscount(activeCoupons[couponIdx])}</p>
-              <p className="text-white/60 text-xs mt-0.5">{activeCoupons[couponIdx].productName}</p>
+              <p className="text-white/80 text-xs mt-0.5">{activeCoupons[couponIdx].productName}</p>
             </div>
 
             {/* Barcode */}
             <div className="p-6">
-              <p className="text-[10px] uppercase tracking-widest text-center mb-4 font-semibold text-forest-900/25">Scan Coupon</p>
+              <p className="text-[10px] uppercase tracking-widest text-center mb-4 font-semibold text-forest-900/60">Scan Coupon</p>
               <BarcodeDisplay value={activeCoupons[couponIdx].barcode!} height={80} />
               {activeCoupons[couponIdx].description && (
-                <p className="text-xs text-center text-forest-900/40 mt-3">{activeCoupons[couponIdx].description}</p>
+                <p className="text-xs text-center text-forest-900/55 mt-3">{activeCoupons[couponIdx].description}</p>
               )}
             </div>
           </div>
@@ -197,7 +197,7 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
           {/* Navigation */}
           <div className="mt-8 w-full max-w-sm flex gap-3">
             <button onClick={prevCoupon}
-              className="flex-1 py-4 rounded-xl text-white/60 font-semibold text-sm min-h-[52px]" style={{ background: 'rgba(255,255,255,0.08)' }}>
+              className="flex-1 py-4 rounded-xl text-white/80 font-semibold text-sm min-h-[52px]" style={{ background: 'rgba(255,255,255,0.08)' }}>
               ← {couponIdx === 0 ? 'Card' : 'Prev'}
             </button>
             <button onClick={nextCoupon}
@@ -218,7 +218,7 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
           </div>
 
           <h2 className="text-white font-display font-bold text-2xl">All done</h2>
-          <p className="text-white/40 text-sm mt-2">
+          <p className="text-white/70 text-sm mt-2">
             {activeCoupons.length > 0 ? `Card + ${activeCoupons.length} coupon${activeCoupons.length > 1 ? 's' : ''} presented` : 'Card scanned'}
           </p>
 
@@ -232,7 +232,7 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
                 </div>
                 <div>
                   <p className="text-white text-sm font-semibold">Log this trip to budget</p>
-                  <p className="text-white/40 text-[11px]">{checkedCount} items from "{activeList.name}" · est. total tracked</p>
+                  <p className="text-white/70 text-[11px]">{checkedCount} items from "{activeList.name}" · est. total tracked</p>
                 </div>
               </button>
             </div>

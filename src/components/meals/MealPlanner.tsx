@@ -86,14 +86,14 @@ export function MealPlanner({ pantryItems, onGenerateList }: Props) {
           {meals.length > 0 && (
             <button onClick={generateShoppingList}
               className="px-3 py-1.5 rounded-full text-xs font-semibold text-white bg-forest-600 active:scale-95 transition-transform">
-              🛒 Generate List
+              Generate List
             </button>
           )}
         </div>
         <div className="flex gap-1 p-1 rounded-xl bg-gray-100 mb-3">
           <button onClick={() => setView('planner')} className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
             style={{ background: view === 'planner' ? 'white' : 'transparent', color: view === 'planner' ? '#1B4332' : '#6B7280', boxShadow: view === 'planner' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-            📅 Week Plan
+            Week Plan
           </button>
           <button onClick={() => setView('recipes')} className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
             style={{ background: view === 'recipes' ? 'white' : 'transparent', color: view === 'recipes' ? '#1B4332' : '#6B7280', boxShadow: view === 'recipes' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
@@ -127,7 +127,7 @@ export function MealPlanner({ pantryItems, onGenerateList }: Props) {
                         {recipe ? (
                           <span className="text-[9px] font-medium text-forest-600 leading-tight mt-0.5 line-clamp-2">{recipe.name}</span>
                         ) : (
-                          <span className="text-[9px] text-gray-300 mt-0.5">+ Add</span>
+                          <span className="text-[9px] text-gray-400 mt-0.5">+ Add</span>
                         )}
                       </button>
                     );
@@ -160,7 +160,7 @@ export function MealPlanner({ pantryItems, onGenerateList }: Props) {
                   </div>
                 </div>
                 <p className="text-xs text-gray-400 mt-0.5">{recipe.description}</p>
-                <p className="text-[10px] text-gray-300 mt-1">
+                <p className="text-[10px] text-gray-400 mt-1">
                   {recipe.servings} servings · {recipe.prepTime + recipe.cookTime} min · {recipe.ingredients.length} ingredients
                 </p>
                 {selectedRecipe?.id === recipe.id && (

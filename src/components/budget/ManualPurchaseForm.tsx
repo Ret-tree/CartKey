@@ -100,7 +100,7 @@ export function ManualPurchaseForm({ onSubmit }: Props) {
                   <span className="text-sm">{cat?.icon || '📦'}</span>
                   <span className="flex-1 text-sm text-gray-700 truncate">{item.name}</span>
                   <span className="text-sm font-mono text-gray-600">${parseFloat(item.price).toFixed(2)}</span>
-                  <button onClick={() => removeItem(item.id)} className="text-gray-300 text-xs">✕</button>
+                  <button onClick={() => removeItem(item.id)} className="text-gray-400 text-xs">✕</button>
                 </div>
               );
             })}

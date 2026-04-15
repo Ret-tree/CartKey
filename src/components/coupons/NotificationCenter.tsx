@@ -69,7 +69,7 @@ export function NotificationCenter({ notifications, onMarkRead, onMarkAllRead, o
                     {!n.read && <div className="w-2 h-2 rounded-full bg-forest-500 flex-shrink-0" />}
                   </div>
                   <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{n.body}</p>
-                  <p className="text-[10px] text-gray-300 mt-1">{timeAgo(n.createdAt)}</p>
+                  <p className="text-[10px] text-gray-400 mt-1">{timeAgo(n.createdAt)}</p>
                 </div>
               </button>
             ))
@@ -84,7 +84,9 @@ export function NotificationCenter({ notifications, onMarkRead, onMarkAllRead, o
 export function NotificationBell({ count, onClick }: { count: number; onClick: () => void }) {
   return (
     <button onClick={onClick} className="relative w-8 h-8 rounded-full flex items-center justify-center bg-white/15">
-      <span className="text-sm">🔔</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" />
+      </svg>
       {count > 0 && (
         <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
           {count > 9 ? '9+' : count}

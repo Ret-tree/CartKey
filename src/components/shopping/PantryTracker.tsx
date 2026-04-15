@@ -50,7 +50,7 @@ export function PantryTracker({ items, onUpdate }: Props) {
         
         {expiringSoon.length > 0 && (
           <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 mb-3">
-            <p className="text-[10px] font-semibold text-amber-700">⏰ {expiringSoon.length} item{expiringSoon.length > 1 ? 's' : ''} expiring soon</p>
+            <p className="text-[10px] font-semibold text-amber-700">{expiringSoon.length} item{expiringSoon.length > 1 ? 's' : ''} expiring soon</p>
             <p className="text-[10px] text-amber-600">{expiringSoon.map((i) => i.name).join(', ')}</p>
           </div>
         )}
@@ -70,14 +70,14 @@ export function PantryTracker({ items, onUpdate }: Props) {
       <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
         {items.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-4xl mb-3">🏠</div>
+            
             <p className="text-sm text-gray-500">Pantry is empty</p>
             <p className="text-xs text-gray-400 mt-1">Add items you have on hand to avoid buying duplicates</p>
           </div>
         ) : (
           Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([cat, catItems]) => (
             <div key={cat} className="mb-4">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-300 mb-1 capitalize">{cat}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1 capitalize">{cat}</p>
               <div className="space-y-1">
                 {catItems.map((item) => (
                   <div key={item.id} className="flex items-center gap-2 p-2 rounded-xl bg-white">
@@ -92,7 +92,7 @@ export function PantryTracker({ items, onUpdate }: Props) {
                       <span className="text-xs font-mono w-6 text-center text-gray-600">{item.quantity}</span>
                       <button onClick={() => updateQty(item.id, 1)} className="w-6 h-6 rounded text-xs text-gray-400 bg-gray-100">+</button>
                     </div>
-                    <button onClick={() => removeItem(item.id)} className="text-gray-300 text-sm">✕</button>
+                    <button onClick={() => removeItem(item.id)} className="text-gray-400 text-sm">✕</button>
                   </div>
                 ))}
               </div>

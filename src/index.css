@@ -7,11 +7,22 @@
   body { overscroll-behavior: none; background: #FAFAF5; }
   * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
+  /* Dynamic viewport height (iOS Safari URL bar) */
+  :root {
+    --app-height: 100dvh;
+  }
+  @supports not (height: 100dvh) {
+    :root { --app-height: 100vh; }
+  }
+
   /* Dark mode base */
   html.dark body { background: #1A1F16; color: #E8E7DF; }
   html.dark .card-surface { background: #242920; border-color: #333D2D; }
   html.dark input, html.dark select { background: #242920; border-color: #333D2D; color: #E8E7DF; }
   html.dark input::placeholder { color: #5C6356; }
+
+  /* Prevent iOS input zoom - ensure all inputs are 16px+ */
+  input, select, textarea { font-size: 16px !important; }
 }
 
 @layer components {
@@ -23,6 +34,14 @@
 
   /* Card surface - warm white with subtle warmth */
   .card-surface { background: white; border: 1px solid #E8E7DF; }
+
+  /* App container height - handles iOS Safari URL bar */
+  .app-height { height: var(--app-height, 100vh); }
+
+  /* Safe area padding */
+  .safe-top { padding-top: env(safe-area-inset-top, 0px); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .safe-x { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
 
   /* Key-shaped decorative element */
   .key-accent::before {

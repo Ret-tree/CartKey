@@ -17,6 +17,7 @@ import { PantryTracker } from './components/shopping/PantryTracker';
 import { BudgetDashboard } from './components/budget/BudgetDashboard';
 import { PriceIntelligence } from './components/budget/PriceIntelligence';
 import { CheckoutMode } from './components/checkout/CheckoutMode';
+import { IconHome, IconList, IconTag, IconWallet, IconUser, IconPlus, IconCalendar, IconBarcode, IconRefresh, IconBell, IconChart, IconLocation } from './components/Icons';
 import type { LoyaltyCard, DietaryProfile, AppNotification } from './lib/types';
 import type { ShoppingList, PantryItem } from './data/shopping';
 import type { BudgetConfig, PurchaseRecord } from './data/budget';
@@ -118,7 +119,7 @@ export default function App() {
   // ─── Loading ───
   if (!loaded) {
     return (
-      <div className="h-screen flex items-center justify-center bg-warm-50">
+      <div className="app-height flex items-center justify-center bg-warm-50">
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl bg-forest-900 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-forest-900/20">
             <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
@@ -136,7 +137,7 @@ export default function App() {
   // ─── Onboarding ───
   if (!onboarded) {
     return (
-      <div className="h-screen max-w-md mx-auto font-sans">
+      <div className="app-height max-w-md mx-auto font-sans">
         <OnboardingFlow onComplete={handleOnboardingComplete} />
       </div>
     );
@@ -160,17 +161,17 @@ export default function App() {
             {nearbyStoreId ? nearbyStoreInfo!.name : 'Open near a store for auto-detect'}
           </p>
           {geo.nearbyLocation && (
-            <p className="text-[10px] text-forest-900/30 truncate">{geo.nearbyLocation.address}</p>
+            <p className="text-[10px] text-forest-900/60 truncate">{geo.nearbyLocation.address}</p>
           )}
         </div>
-        <button onClick={geo.detect} className="w-9 h-9 rounded-lg flex items-center justify-center bg-warm-100 text-sm active:scale-90 transition-transform flex-shrink-0 min-h-[36px]">↻</button>
+        <button onClick={geo.detect} className="w-9 h-9 rounded-lg flex items-center justify-center bg-warm-100 active:scale-90 transition-transform flex-shrink-0 min-h-[36px]"><IconRefresh size={14} className="text-forest-900/55" /></button>
       </div>
 
       {/* Pending trip prompt */}
       {pendingTrip && (
         <div className="mx-4 mt-3 p-4 rounded-xl border-2 border-brass-200 bg-brass-50 animate-fade-in">
           <p className="text-sm font-bold text-forest-900">Did you finish your trip?</p>
-          <p className="text-[11px] text-forest-900/50 mt-0.5">You had checked items at {pendingTrip.storeName}</p>
+          <p className="text-[11px] text-forest-900/60 mt-0.5">You had checked items at {pendingTrip.storeName}</p>
           <div className="flex gap-2 mt-3">
             <button onClick={() => {
               const list = shoppingLists.find((l) => l.id === pendingTrip.listId);
@@ -185,7 +186,7 @@ export default function App() {
             }} className="flex-1 py-2.5 rounded-lg bg-brass-400 text-forest-900 text-xs font-bold min-h-[40px]">
               Log Trip
             </button>
-            <button onClick={() => setPendingTrip(null)} className="flex-1 py-2.5 rounded-lg bg-warm-200 text-forest-900/50 text-xs font-semibold min-h-[40px]">
+            <button onClick={() => setPendingTrip(null)} className="flex-1 py-2.5 rounded-lg bg-warm-200 text-forest-900/60 text-xs font-semibold min-h-[40px]">
               Dismiss
             </button>
           </div>
@@ -196,7 +197,7 @@ export default function App() {
       {nearbyCard && (
         <div className="mx-4 mt-4 animate-fade-in">
           <div className="flex items-center justify-between mb-2 px-1">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-forest-900/25">Ready to scan</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-forest-900/60">Ready to scan</p>
             <button onClick={() => setShowCheckout(true)}
               className="px-4 py-2 rounded-lg bg-brass-400 text-forest-900 text-xs font-bold active:scale-[0.95] transition-transform min-h-[36px] shadow-sm shadow-brass-400/30">
               Checkout →
@@ -214,7 +215,7 @@ export default function App() {
             </div>
             <div className="bg-white p-4">
               <BarcodeDisplay value={nearbyCard.cardNumber} height={60} symbology={getStoreSymbology(nearbyCard.storeId) as any} />
-              <p className="text-center text-[10px] mt-2 font-medium text-forest-900/20">Tap to enlarge · or use Checkout for full flow</p>
+              <p className="text-center text-[10px] mt-2 font-medium text-forest-900/55">Tap to enlarge · or use Checkout for full flow</p>
             </div>
           </button>
         </div>
@@ -227,7 +228,7 @@ export default function App() {
             className="w-full p-4 rounded-2xl border border-forest-500/20 bg-forest-50/30 text-left active:scale-[0.98] transition-transform">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-forest-600 flex items-center justify-center text-white text-lg">🏷️</div>
+                <div className="w-10 h-10 rounded-xl bg-forest-600 flex items-center justify-center"><IconTag size={18} className="text-white" /></div>
                 <div>
                   <p className="text-sm font-bold text-forest-600">{storeAvailableCoupons} coupons available</p>
                   <p className="text-[11px] text-gray-400">At {nearbyStoreInfo!.name} · diet-filtered</p>
@@ -248,7 +249,7 @@ export default function App() {
         }}>
         <div className="flex items-center justify-between mb-2">
           <p className="text-xs font-semibold" style={{ color: budgetSummary.percentUsed > 0.9 ? '#DC2626' : budgetSummary.percentUsed > 0.75 ? '#D97706' : '#16A34A' }}>
-            💰 {formatPeriodLabel(budgetConfig.period)} Budget
+            {formatPeriodLabel(budgetConfig.period)} Budget
           </p>
           <p className="text-[10px] text-gray-400">{budgetDaysLeft}d left</p>
         </div>
@@ -266,27 +267,27 @@ export default function App() {
 
       {/* Quick actions */}
       <div className="mx-4 mt-5">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-forest-900/25 mb-2.5 px-1">Quick Actions</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-forest-900/60 mb-2.5 px-1">Quick Actions</p>
         <div className="grid grid-cols-2 gap-2.5">
           <button onClick={() => { setTab('lists'); setListsSubTab('lists'); }} className="p-4 rounded-xl card-surface text-left active:scale-[0.97] transition-transform min-h-[80px]">
-            <span className="text-xl">📋</span>
+            <div className="w-8 h-8 rounded-lg bg-forest-100 flex items-center justify-center"><IconList size={16} className="text-forest-600" /></div>
             <p className="text-sm font-bold mt-1.5 text-forest-900">Shopping Lists</p>
-            <p className="text-[11px] text-forest-900/35">{shoppingLists.length} list{shoppingLists.length !== 1 ? 's' : ''}</p>
+            <p className="text-[11px] text-forest-900/60">{shoppingLists.length} list{shoppingLists.length !== 1 ? 's' : ''}</p>
           </button>
           <button onClick={() => { setTab('lists'); setListsSubTab('meals'); }} className="p-4 rounded-xl card-surface text-left active:scale-[0.97] transition-transform min-h-[80px]">
-            <span className="text-xl">📅</span>
+            <div className="w-8 h-8 rounded-lg bg-brass-50 flex items-center justify-center"><IconCalendar size={16} className="text-brass-600" /></div>
             <p className="text-sm font-bold mt-1.5 text-forest-900">Meal Planner</p>
-            <p className="text-[11px] text-forest-900/35">Plan & generate lists</p>
+            <p className="text-[11px] text-forest-900/60">Plan & generate lists</p>
           </button>
           <button onClick={() => { setTab('coupons'); setCouponSubTab('coupons'); }} className="p-4 rounded-xl card-surface text-left active:scale-[0.97] transition-transform min-h-[80px]">
-            <span className="text-xl">🏷️</span>
+            <div className="w-8 h-8 rounded-lg bg-forest-100 flex items-center justify-center"><IconTag size={16} className="text-forest-600" /></div>
             <p className="text-sm font-bold mt-1.5 text-forest-900">Coupons</p>
-            <p className="text-[11px] text-forest-900/35">{clippedIds.length} clipped</p>
+            <p className="text-[11px] text-forest-900/60">{clippedIds.length} clipped</p>
           </button>
           <button onClick={() => setTab('budget')} className="p-4 rounded-xl card-surface text-left active:scale-[0.97] transition-transform min-h-[80px]">
-            <span className="text-xl">💰</span>
+            <div className="w-8 h-8 rounded-lg bg-brass-50 flex items-center justify-center"><IconWallet size={16} className="text-brass-600" /></div>
             <p className="text-sm font-bold mt-1.5 text-forest-900">Budget</p>
-            <p className="text-[11px] text-forest-900/35">{formatCurrency(budgetSummary.remaining)} left</p>
+            <p className="text-[11px] text-forest-900/60">{formatCurrency(budgetSummary.remaining)} left</p>
           </button>
         </div>
       </div>
@@ -294,7 +295,7 @@ export default function App() {
       {/* Card carousel */}
       {cards.length > 0 && (
         <div className="mt-5">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-forest-900/25 mb-2.5 px-5">Your Cards</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-forest-900/60 mb-2.5 px-5">Your Cards</p>
           <div className="flex gap-2.5 overflow-x-auto scrollbar-hide px-4 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
             {cards.map((card) => (
               <button key={card.id} onClick={() => setSelectedCard(card)} className="flex-shrink-0 w-36 rounded-xl overflow-hidden text-left shadow-md shadow-forest-900/5" style={{ scrollSnapAlign: 'start' }}>
@@ -363,12 +364,12 @@ export default function App() {
             <button onClick={() => setCouponSubTab('coupons')}
               className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
               style={{ background: couponSubTab === 'coupons' ? 'white' : 'transparent', color: couponSubTab === 'coupons' ? '#1B4332' : '#6B7280', boxShadow: couponSubTab === 'coupons' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-              🏷️ Coupons
+              Coupons
             </button>
             <button onClick={() => setCouponSubTab('ads')}
               className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
               style={{ background: couponSubTab === 'ads' ? 'white' : 'transparent', color: couponSubTab === 'ads' ? '#1B4332' : '#6B7280', boxShadow: couponSubTab === 'ads' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-              📰 Weekly Ads
+              Weekly Ads
             </button>
           </div>
 
@@ -413,7 +414,7 @@ export default function App() {
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-4xl mb-3">📰</div>
+              
               <p className="text-sm text-gray-500">Select a store to view weekly ads</p>
             </div>
           </div>
@@ -465,7 +466,7 @@ export default function App() {
         </button>
 
         {/* Settings section */}
-        <p className="text-xs font-semibold uppercase tracking-widest text-forest-900/25 mb-2">Settings</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-forest-900/60 mb-2">Settings</p>
         <div className="space-y-2 mb-4">
           {/* Dark mode toggle */}
           <div className="p-3 rounded-xl card-surface">
@@ -475,7 +476,7 @@ export default function App() {
                 <button key={t} onClick={() => setTheme(t)}
                   className="flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all min-h-[36px]"
                   style={{ background: theme === t ? '#1A1F16' : '#F4F3ED', color: theme === t ? '#F5E6B8' : '#5C6356' }}>
-                  {t === 'light' ? '☀️ Light' : t === 'dark' ? '🌙 Dark' : '⚙️ System'}
+                  {t === 'light' ? 'Light' : t === 'dark' ? 'Dark' : 'System'}
                 </button>
               ))}
             </div>
@@ -483,16 +484,16 @@ export default function App() {
 
           <div className="p-3 rounded-xl card-surface">
             <p className="text-sm font-semibold text-forest-900">Location</p>
-            <p className="text-xs mt-0.5 text-forest-900/40">
+            <p className="text-xs mt-0.5 text-forest-900/55">
               {geo.status === 'detected' ? `Near ${nearbyStoreInfo?.name}` : geo.status === 'denied' ? 'Access denied' : geo.status === 'none_nearby' ? 'No stores nearby' : 'Idle'}
             </p>
-            <button onClick={geo.detect} className="mt-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-warm-100 text-forest-900/50">Refresh</button>
+            <button onClick={geo.detect} className="mt-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-warm-100 text-forest-900/60">Refresh</button>
           </div>
 
           {/* Data export/import */}
           <div className="p-3 rounded-xl card-surface">
             <p className="text-sm font-semibold text-forest-900">Data & Backup</p>
-            <p className="text-xs mt-0.5 text-forest-900/40">{cards.length} cards · {purchases.length} purchases · {shoppingLists.length} lists</p>
+            <p className="text-xs mt-0.5 text-forest-900/55">{cards.length} cards · {purchases.length} purchases · {shoppingLists.length} lists</p>
             <div className="flex gap-2 mt-2">
               <button onClick={downloadBackup} className="flex-1 py-2 rounded-lg text-xs font-semibold bg-forest-900 text-brass-100 min-h-[36px]">
                 Export Backup
@@ -517,12 +518,12 @@ export default function App() {
 
           <button onClick={() => setShowAddCard(true)} className="p-3 rounded-xl card-surface text-left w-full">
             <p className="text-sm font-semibold text-forest-900">Loyalty Cards ({cards.length})</p>
-            <p className="text-xs mt-0.5 text-forest-900/40">Tap to add a new card</p>
+            <p className="text-xs mt-0.5 text-forest-900/55">Tap to add a new card</p>
           </button>
 
           <div className="p-3 rounded-xl card-surface">
             <p className="text-sm font-semibold text-forest-900">About</p>
-            <p className="text-xs mt-0.5 text-forest-900/40">CartKey v1.0.0 · MIT License · grocery.blackatlas.tech</p>
+            <p className="text-xs mt-0.5 text-forest-900/55">CartKey v1.0.0 · MIT License · grocery.blackatlas.tech</p>
           </div>
 
           <button onClick={() => { if (confirm('Reset all data? This cannot be undone.')) { setCards([]); setProfile({ diet: '', allergens: [], customExclusions: '' }); setClippedIds([]); setNotifications(MOCK_NOTIFICATIONS); setShoppingLists([]); setPantryItems([]); setBudgetConfig(DEFAULT_BUDGET); setPurchases([]); setPendingTrip(null); setTheme('system'); setOnboarded(false); } }}
@@ -546,15 +547,15 @@ export default function App() {
           <div className="flex gap-1 p-1 rounded-xl bg-gray-100">
             <button onClick={() => setListsSubTab('lists')} className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
               style={{ background: listsSubTab === 'lists' ? 'white' : 'transparent', color: listsSubTab === 'lists' ? '#1B4332' : '#6B7280', boxShadow: listsSubTab === 'lists' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-              📋 Lists
+              Lists
             </button>
             <button onClick={() => setListsSubTab('meals')} className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
               style={{ background: listsSubTab === 'meals' ? 'white' : 'transparent', color: listsSubTab === 'meals' ? '#1B4332' : '#6B7280', boxShadow: listsSubTab === 'meals' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-              📅 Meals
+              Meals
             </button>
             <button onClick={() => setListsSubTab('pantry')} className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
               style={{ background: listsSubTab === 'pantry' ? 'white' : 'transparent', color: listsSubTab === 'pantry' ? '#1B4332' : '#6B7280', boxShadow: listsSubTab === 'pantry' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-              🏠 Pantry
+              Pantry
             </button>
           </div>
         </div>
@@ -566,19 +567,18 @@ export default function App() {
   };
 
   // ─── Tab Config ───
-  const tabs: { id: TabId; label: string; icon: string }[] = [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'lists', label: 'Lists', icon: '📋' },
-    { id: 'coupons', label: 'Coupons', icon: '🏷️' },
-    { id: 'budget', label: 'Budget', icon: '💰' },
-    { id: 'profile', label: 'Profile', icon: '👤' },
-  ];
+  const tabIcons: Record<TabId, (p: { size?: number; className?: string }) => JSX.Element> = {
+    home: IconHome, lists: IconList, coupons: IconTag, budget: IconWallet, profile: IconUser,
+  };
+  const tabLabels: Record<TabId, string> = {
+    home: 'Home', lists: 'Lists', coupons: 'Coupons', budget: 'Budget', profile: 'Profile',
+  };
 
   return (
-    <div className="h-screen max-w-md mx-auto flex flex-col font-sans bg-warm-50">
+    <div className="app-height max-w-md mx-auto flex flex-col font-sans bg-warm-50">
       {/* Header */}
       <div className="relative">
-        <div className="flex items-center justify-between px-4 py-3 bg-forest-900">
+        <div className="flex items-center justify-between px-4 py-3 bg-forest-900 safe-top">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-brass-400/20 flex items-center justify-center">
               <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
@@ -609,11 +609,11 @@ export default function App() {
             <div className="flex gap-1 p-1 rounded-xl bg-gray-100">
               <button onClick={() => setBudgetSubTab('budget')} className="flex-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
                 style={{ background: budgetSubTab === 'budget' ? 'white' : 'transparent', color: budgetSubTab === 'budget' ? '#1B4332' : '#6B7280', boxShadow: budgetSubTab === 'budget' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-                💰 Budget
+                Budget
               </button>
               <button onClick={() => setBudgetSubTab('prices')} className="flex-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
                 style={{ background: budgetSubTab === 'prices' ? 'white' : 'transparent', color: budgetSubTab === 'prices' ? '#1B4332' : '#6B7280', boxShadow: budgetSubTab === 'prices' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-                📈 Prices & Savings
+                Prices & Savings
               </button>
             </div>
           </div>
@@ -624,16 +624,17 @@ export default function App() {
       {tab === 'profile' && <ProfileScreen />}
 
       {/* Bottom Nav */}
-      <div className="border-t border-warm-200 bg-white">
+      <div className="border-t border-warm-200 bg-white safe-bottom">
         <div className="flex">
-          {tabs.map((t) => {
-            const active = tab === t.id;
+          {(['home', 'lists', 'coupons', 'budget', 'profile'] as TabId[]).map((id) => {
+            const active = tab === id;
+            const Icon = tabIcons[id];
             return (
-              <button key={t.id} onClick={() => setTab(t.id)}
+              <button key={id} onClick={() => setTab(id)}
                 className="flex-1 flex flex-col items-center py-2.5 transition-all min-h-[52px] relative">
                 {active && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-b-full bg-brass-400" />}
-                <span className={`text-lg transition-transform ${active ? 'scale-110' : ''}`}>{t.icon}</span>
-                <span className={`text-[10px] mt-0.5 font-semibold ${active ? 'text-forest-900' : 'text-forest-900/30'}`}>{t.label}</span>
+                <Icon size={20} className={active ? 'text-forest-900' : 'text-forest-900/40'} />
+                <span className={`text-[10px] mt-1 font-semibold ${active ? 'text-forest-900' : 'text-forest-900/40'}`}>{tabLabels[id]}</span>
               </button>
             );
           })}

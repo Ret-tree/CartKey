@@ -122,12 +122,12 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
             <span className="text-gray-400">{uncheckedCount} items left</span>
             {totalMatches > 0 && (
               <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-semibold">
-                🏷️ {totalMatches} coupon{totalMatches > 1 ? 's' : ''} matched
+                {totalMatches} coupon{totalMatches > 1 ? 's' : ''} matched
               </span>
             )}
             {estimatedSavings > 0 && (
               <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-semibold">
-                💰 ~${estimatedSavings.toFixed(2)} savings
+                ~${estimatedSavings.toFixed(2)} savings
               </span>
             )}
           </div>
@@ -152,7 +152,7 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
           ) : (
             Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([cat, items]) => (
               <div key={cat} className="mb-4">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-300 mb-1 capitalize">{cat}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1 capitalize">{cat}</p>
                 <div className="space-y-1">
                   {items.map((item) => (
                     <div key={item.id} className="flex items-center gap-2 p-2 rounded-xl transition-all"
@@ -163,11 +163,11 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
                         {item.checked && <span className="text-white text-xs">✓</span>}
                       </button>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm ${item.checked ? 'line-through text-gray-300' : 'text-gray-800'}`}>{item.name}</p>
+                        <p className={`text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>{item.name}</p>
                         {item.matchedCouponIds.length > 0 && !item.checked && (
                           <button onClick={() => setShowMatches(showMatches === item.id ? null : item.id)}
                             className="text-[10px] text-green-600 font-semibold mt-0.5">
-                            🏷️ {item.matchedCouponIds.length} coupon{item.matchedCouponIds.length > 1 ? 's' : ''} available
+                            {item.matchedCouponIds.length} coupon{item.matchedCouponIds.length > 1 ? 's' : ''} available
                           </button>
                         )}
                         {showMatches === item.id && (
@@ -195,7 +195,7 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
                         <span className="text-xs font-mono w-5 text-center text-gray-600">{item.quantity}</span>
                         <button onClick={() => updateItemQty(item.id, item.quantity + 1)} className="w-6 h-6 rounded text-xs text-gray-400 bg-gray-100">+</button>
                       </div>
-                      <button onClick={() => removeItem(item.id)} className="text-gray-300 text-sm">✕</button>
+                      <button onClick={() => removeItem(item.id)} className="text-gray-400 text-sm">✕</button>
                     </div>
                   ))}
                 </div>
@@ -207,7 +207,7 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
           {activeList && activeList.items.length > 0 && uncheckedCount === 0 && onFinishTrip && (
             <div className="mt-4 p-4 rounded-xl border-2 border-brass-200 bg-brass-50 animate-fade-in">
               <p className="text-sm font-bold text-forest-900">All items checked!</p>
-              <p className="text-[11px] text-forest-900/50 mt-0.5">Ready to check out? We'll log this trip to your budget.</p>
+              <p className="text-[11px] text-forest-900/60 mt-0.5">Ready to check out? We'll log this trip to your budget.</p>
               <button onClick={onFinishTrip}
                 className="mt-3 w-full py-3 rounded-lg bg-brass-400 text-forest-900 font-bold text-sm active:scale-[0.97] transition-transform">
                 Start Checkout →
@@ -222,7 +222,7 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
       ) : (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-4xl mb-3">📋</div>
+            
             <p className="text-sm text-gray-500">Create your first shopping list</p>
             <button onClick={() => setShowNewList(true)} className="mt-3 px-6 py-2 rounded-xl text-white text-sm font-semibold bg-forest-600">New List</button>
           </div>

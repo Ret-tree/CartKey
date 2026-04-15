@@ -197,7 +197,7 @@ export function ReceiptScanner({ onScanComplete, onCancel }: Props) {
       {stage === 'done' && (
         <div className="text-center py-12">
           <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3">
-            <span className="text-3xl">✅</span>
+            
           </div>
           <p className="text-sm font-semibold text-green-600">Receipt scanned successfully!</p>
         </div>

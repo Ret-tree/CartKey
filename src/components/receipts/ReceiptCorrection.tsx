@@ -117,12 +117,12 @@ export function ReceiptCorrection({ receipt, onSave, onRescan, onCancel }: Props
                   <span className="text-sm">{cat?.icon || '📦'}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 truncate">{item.name}</p>
-                    {showRaw && <p className="text-[9px] text-gray-300 font-mono truncate">{item.raw}</p>}
+                    {showRaw && <p className="text-[9px] text-gray-400 font-mono truncate">{item.raw}</p>}
                   </div>
                   {item.quantity > 1 && <span className="text-[10px] text-gray-400">×{item.quantity}</span>}
                   <span className="text-sm font-mono font-semibold text-gray-800">{formatCurrency(item.totalPrice)}</span>
                   <button onClick={(e) => { e.stopPropagation(); removeItem(idx); }}
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-gray-300 hover:text-red-400 text-xs">✕</button>
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-red-400 text-xs">✕</button>
                 </div>
 
                 {isEditing && (
@@ -164,7 +164,7 @@ export function ReceiptCorrection({ receipt, onSave, onRescan, onCancel }: Props
             onChange={(e) => setAddName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addItem()}
             className="flex-1 px-3 py-2 rounded-xl text-sm border border-gray-200 bg-gray-50 outline-none" />
           <div className="relative w-20">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-300 text-xs">$</span>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
             <input type="number" step="0.01" placeholder="0.00" value={addPrice}
               onChange={(e) => setAddPrice(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addItem()}
               className="w-full pl-5 pr-2 py-2 rounded-xl text-sm border border-gray-200 bg-gray-50 outline-none font-mono" />
@@ -212,7 +212,7 @@ export function ReceiptCorrection({ receipt, onSave, onRescan, onCancel }: Props
       {/* Actions */}
       <button onClick={save} disabled={items.length === 0}
         className="w-full py-3.5 rounded-2xl text-white font-semibold text-base bg-forest-600 disabled:opacity-40 active:scale-[0.98] transition-all">
-        ✅ Save Purchase
+        Save Purchase
       </button>
       <button onClick={onCancel} className="w-full py-2 text-sm text-gray-400 underline">Discard</button>
     </div>

@@ -56,7 +56,7 @@ export function BarcodeDisplay({ value, height = 80, showText = true, symbology 
         <canvas ref={canvasRef} style={{ maxWidth: '100%', height: 'auto', imageRendering: 'pixelated' }} />
       )}
       {showText && !error && (
-        <p className="text-[11px] tracking-[0.25em] mt-1.5 font-mono text-forest-900/35">{value}</p>
+        <p className="text-[11px] tracking-[0.25em] mt-1.5 font-mono text-forest-900/60">{value}</p>
       )}
     </div>
   );

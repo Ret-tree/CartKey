@@ -47,7 +47,7 @@ export function BudgetDashboard({ budget, purchases, onUpdateBudget, onAddPurcha
               className="flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all"
               style={{ background: view === v ? 'white' : 'transparent', color: view === v ? '#1B4332' : '#6B7280',
                 boxShadow: view === v ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-              {v === 'overview' ? '📊 Overview' : v === 'log' ? '➕ Log' : '⚙️ Settings'}
+              {v === 'overview' ? 'Overview' : v === 'log' ? 'Log' : 'Settings'}
             </button>
           ))}
         </div>
@@ -87,7 +87,7 @@ export function BudgetDashboard({ budget, purchases, onUpdateBudget, onAddPurcha
             )}
             {summary.percentUsed >= 0.75 && summary.percentUsed < 0.9 && (
               <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
-                <p className="text-xs font-semibold text-amber-600">📊 75% of budget used</p>
+                <p className="text-xs font-semibold text-amber-600">75% of budget used</p>
                 <p className="text-[10px] text-amber-500 mt-0.5">{formatCurrency(dailyBudgetRemaining)} per day for the remaining {daysLeft} days</p>
               </div>
             )}
@@ -145,7 +145,7 @@ export function BudgetDashboard({ budget, purchases, onUpdateBudget, onAddPurcha
 
             {/* Savings tracker */}
             <div className="p-4 rounded-2xl border border-green-100 bg-green-50/30">
-              <p className="text-xs font-semibold text-green-700 mb-2">💰 Savings This Month</p>
+              <p className="text-xs font-semibold text-green-700 mb-2">Savings This Month</p>
               <div className="flex items-center gap-4">
                 <div>
                   <p className="text-xl font-bold text-green-700">{formatCurrency(savings.totalSaved)}</p>
@@ -195,7 +195,7 @@ export function BudgetDashboard({ budget, purchases, onUpdateBudget, onAddPurcha
 
             {purchases.length === 0 && (
               <div className="p-4 rounded-2xl border border-gray-100 text-center">
-                <div className="text-3xl mb-2">📊</div>
+                <p className="text-sm font-bold text-forest-900/55 mb-2">No data yet</p>
                 <p className="text-sm text-gray-500">No purchases logged yet</p>
                 <p className="text-xs text-gray-400 mt-1">Scan a receipt or log manually</p>
                 <div className="flex gap-2 mt-3 justify-center">
@@ -325,7 +325,7 @@ function BudgetSettings({ budget, onSave }: { budget: BudgetConfig; onSave: (b: 
               <span className="text-sm w-6">{cat.icon}</span>
               <span className="text-xs text-gray-600 w-16">{cat.label}</span>
               <div className="relative flex-1">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-300 text-[11px]">$</span>
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-[11px]">$</span>
                 <input type="number" placeholder="No limit"
                   value={catLimits[cat.id] || ''}
                   onChange={(e) => setCatLimits((p) => ({ ...p, [cat.id]: parseFloat(e.target.value) || 0 }))}
