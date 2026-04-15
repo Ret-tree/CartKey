@@ -2,20 +2,15 @@ name = "cartkey"
 compatibility_date = "2024-06-01"
 pages_build_output_dir = "dist"
 
-# Uncomment these after creating the resources:
-# npx wrangler d1 create cartkey-db
-# npx wrangler kv:namespace create COUPON_CACHE
-# npx wrangler r2 bucket create cartkey-storage
+[[d1_databases]]
+binding = "DB"
+database_name = "cartkey-db"
+database_id = "754dbf02-e0f6-4aec-8b12-3e245b8fbbee"
 
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "cartkey-db"
-# database_id = ""
+[[kv_namespaces]]
+binding = "COUPON_CACHE"
+id = "1ba62d04fbf046f99e5e0348440675cc"
 
-# [[kv_namespaces]]
-# binding = "COUPON_CACHE"
-# id = ""
-
-# [[r2_buckets]]
-# binding = "STORAGE"
-# bucket_name = "cartkey-storage"
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "cartkey-storage"
