@@ -4,8 +4,6 @@
 
 CartKey is an open-source Progressive Web App that unifies grocery store loyalty cards, coupons, and shopping tools into a single interface. When you approach a store, CartKey surfaces your loyalty barcode, available coupons, and weekly ad deals — filtered to your dietary preferences.
 
-🌐 **Live at [grocery.blackatlas.tech](https://grocery.blackatlas.tech)**
-
 ## Features
 
 ### Phase 1 — Foundation
