@@ -13,6 +13,8 @@ import { MealPlanner } from './components/meals/MealPlanner';
 import { PantryTracker } from './components/shopping/PantryTracker';
 import { BudgetDashboard } from './components/budget/BudgetDashboard';
 import { PriceIntelligence } from './components/budget/PriceIntelligence';
+import { PriceMatchDashboard } from './components/budget/PriceMatchDashboard';
+import type { PriceMatchOpportunity } from './data/priceMatch';
 import { CheckoutMode } from './components/checkout/CheckoutMode';
 import { UpdatePrompt } from './components/UpdatePrompt';
 import { IconHome, IconList, IconTag, IconWallet, IconUser, IconPlus, IconCalendar, IconBarcode, IconRefresh, IconBell, IconChart, IconLocation } from './components/Icons';
@@ -39,6 +41,8 @@ export default function App() {
   const [purchases, setPurchases, purchasesLoaded] = useStorage<PurchaseRecord[]>('ck:purchases', []);
   const [theme, setTheme, themeLoaded] = useStorage<ThemeMode>('ck:theme', 'light');
   const [pendingTrip, setPendingTrip, pendingTripLoaded] = useStorage<{ listId: string; storeName: string; checkedAt: string } | null>('ck:pendingTrip', null);
+  const [priceMatches, setPriceMatches, priceMatchesLoaded] = useStorage<PriceMatchOpportunity[]>('ck:priceMatches', []);
+  const [zipCode, setZipCode, zipLoaded] = useStorage<string>('ck:zip', '');
 
   // ─── Local State ───
   const [tab, setTab] = useState<TabId>('home');
@@ -47,11 +51,11 @@ export default function App() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [listsSubTab, setListsSubTab] = useState<'lists' | 'meals' | 'pantry'>('lists');
-  const [budgetSubTab, setBudgetSubTab] = useState<'budget' | 'prices'>('budget');
+  const [budgetSubTab, setBudgetSubTab] = useState<'budget' | 'prices' | 'pricematch'>('budget');
 
   // ─── Geolocation ───
   const geo = useGeolocation();
-  const loaded = cardsLoaded && profileLoaded && onbLoaded && couponsLoaded && notifsLoaded && listsLoaded && pantryLoaded && budgetLoaded && purchasesLoaded && themeLoaded && pendingTripLoaded;
+  const loaded = cardsLoaded && profileLoaded && onbLoaded && couponsLoaded && notifsLoaded && listsLoaded && pantryLoaded && budgetLoaded && purchasesLoaded && themeLoaded && pendingTripLoaded && priceMatchesLoaded && zipLoaded;
 
   useEffect(() => { if (onboarded && loaded) geo.detect(); }, [onboarded, loaded]);
 
@@ -440,7 +444,7 @@ export default function App() {
             <p className="text-xs mt-0.5 text-forest-900/55">CartKey v1.0.0 · MIT License · grocery.blackatlas.tech</p>
           </div>
 
-          <button onClick={() => { if (confirm('Reset all data? This cannot be undone.')) { setCards([]); setProfile({ diet: '', allergens: [], customExclusions: '' }); setManualCoupons([]); setNotifications([]); setShoppingLists([]); setPantryItems([]); setBudgetConfig(DEFAULT_BUDGET); setPurchases([]); setPendingTrip(null); setTheme('light'); setOnboarded(false); } }}
+          <button onClick={() => { if (confirm('Reset all data? This cannot be undone.')) { setCards([]); setProfile({ diet: '', allergens: [], customExclusions: '' }); setManualCoupons([]); setNotifications([]); setShoppingLists([]); setPantryItems([]); setBudgetConfig(DEFAULT_BUDGET); setPurchases([]); setPendingTrip(null); setPriceMatches([]); setZipCode(''); setTheme('light'); setOnboarded(false); } }}
             className="w-full p-3 rounded-xl border border-red-200 bg-red-50 text-left">
             <p className="text-sm font-semibold text-red-600">Reset All Data</p>
           </button>
@@ -527,12 +531,27 @@ export default function App() {
               </button>
               <button onClick={() => setBudgetSubTab('prices')} className="flex-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
                 style={{ background: budgetSubTab === 'prices' ? 'white' : 'transparent', color: budgetSubTab === 'prices' ? '#1B4332' : '#6B7280', boxShadow: budgetSubTab === 'prices' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-                Prices & Savings
+                Prices
+              </button>
+              <button onClick={() => setBudgetSubTab('pricematch')} className="flex-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
+                style={{ background: budgetSubTab === 'pricematch' ? 'white' : 'transparent', color: budgetSubTab === 'pricematch' ? '#1B4332' : '#6B7280', boxShadow: budgetSubTab === 'pricematch' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
+                Price Match
               </button>
             </div>
           </div>
           {budgetSubTab === 'budget' && <BudgetDashboard budget={budgetConfig} purchases={purchases} onUpdateBudget={setBudgetConfig} onAddPurchase={addPurchase} />}
           {budgetSubTab === 'prices' && <PriceIntelligence purchases={purchases} coupons={[]} clippedIds={[]} onClip={() => {}} />}
+          {budgetSubTab === 'pricematch' && (
+            <PriceMatchDashboard
+              purchases={purchases}
+              opportunities={priceMatches}
+              onAddOpportunity={(op) => setPriceMatches((p) => [...p, op])}
+              onUpdateOpportunity={(id, patch) => setPriceMatches((p) => p.map((o) => o.id === id ? { ...o, ...patch } : o))}
+              onDeleteOpportunity={(id) => setPriceMatches((p) => p.filter((o) => o.id !== id))}
+              zipCode={zipCode}
+              onSetZip={setZipCode}
+            />
+          )}
         </div>
       )}
       {tab === 'profile' && <ProfileScreen />}

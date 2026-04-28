@@ -1,9 +1,9 @@
 // ─── CartKey Data Export / Import ───
 
 const STORAGE_KEYS = [
-  'ck:cards', 'ck:profile', 'ck:onboarded', 'ck:clipped',
+  'ck:cards', 'ck:profile', 'ck:onboarded', 'ck:manualCoupons',
   'ck:notifs', 'ck:lists', 'ck:pantry', 'ck:budget',
-  'ck:purchases', 'ck:theme',
+  'ck:purchases', 'ck:theme', 'ck:pendingTrip', 'ck:priceMatches', 'ck:zip',
 ];
 
 export interface CartKeyBackup {
