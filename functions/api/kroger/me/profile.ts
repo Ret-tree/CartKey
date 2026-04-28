@@ -16,6 +16,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   if (!result) return jsonError('Not connected to Kroger', 401);
 
   try {
+    // Primary: /identity/profile returns id and possibly loyaltyId
     const response = await fetch('https://api.kroger.com/v1/identity/profile', {
       headers: { Authorization: `Bearer ${result.accessToken}` },
     });
@@ -26,12 +27,32 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     }
 
     const data = await response.json() as {
-      data: { id: string; loyaltyId?: string };
+      data: { id: string; loyaltyId?: string; loyaltyID?: string };
     };
+
+    // Kroger inconsistently capitalizes the field — check both
+    let loyaltyId = data.data.loyaltyId || data.data.loyaltyID || null;
+
+    // If still missing, try the dedicated loyalty endpoint (requires loyalty scope)
+    if (!loyaltyId) {
+      try {
+        const loyaltyResponse = await fetch('https://api.kroger.com/v1/identity/profile/loyalty', {
+          headers: { Authorization: `Bearer ${result.accessToken}` },
+        });
+        if (loyaltyResponse.ok) {
+          const loyaltyData = await loyaltyResponse.json() as {
+            data?: { loyaltyId?: string; loyaltyID?: string; cardNumber?: string };
+          };
+          loyaltyId = loyaltyData.data?.loyaltyId || loyaltyData.data?.loyaltyID || loyaltyData.data?.cardNumber || null;
+        }
+      } catch {
+        // Loyalty endpoint not accessible — fall through
+      }
+    }
 
     return jsonResponse({
       profileId: data.data.id,
-      loyaltyId: data.data.loyaltyId || null,
+      loyaltyId,
     });
   } catch (err) {
     return jsonError(`Profile fetch failed: ${(err as Error).message}`, 502);

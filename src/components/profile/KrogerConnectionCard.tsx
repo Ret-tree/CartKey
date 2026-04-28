@@ -106,7 +106,12 @@ export function KrogerConnectionCard() {
                 <p className="text-[11px] text-forest-900/55 font-mono text-center mt-1.5">{profile.loyaltyId}</p>
               </div>
             ) : (
-              <p className="text-[11px] text-forest-900/55 italic">No loyalty card on this Kroger account yet.</p>
+              <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
+                <p className="text-[11px] font-semibold text-amber-700 mb-1">Loyalty card not available via API</p>
+                <p className="text-[11px] text-forest-900/60 leading-relaxed">
+                  Kroger's API isn't exposing your Plus Card barcode for this account. This is a Kroger limitation — their public API doesn't return loyalty data for all account types. Add your card manually from the home screen instead and use it normally during checkout.
+                </p>
+              </div>
             )}
 
             <div className="pt-2 border-t border-warm-200">
