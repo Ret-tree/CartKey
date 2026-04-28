@@ -23,7 +23,7 @@ export function useGeolocation() {
     coords: null,
   });
 
-  const detect = useCallback(() => {
+  const detect = useCallback((forceFresh = false) => {
     if (!navigator.geolocation) {
       setState((s) => ({ ...s, status: 'unsupported' }));
       return;
@@ -51,7 +51,8 @@ export function useGeolocation() {
           setState((s) => ({ ...s, status: 'none_nearby' }));
         }
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      // forceFresh=true bypasses the browser's cached location for explicit Refresh taps
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: forceFresh ? 0 : 60000 }
     );
   }, []);
 

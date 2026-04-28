@@ -182,7 +182,7 @@ export default function App() {
             <p className="text-[10px] text-forest-900/60 truncate">{geo.nearbyLocation.address}</p>
           )}
         </div>
-        <button onClick={geo.detect} className="w-9 h-9 rounded-lg flex items-center justify-center bg-warm-100 active:scale-90 transition-transform flex-shrink-0 min-h-[36px]"><IconRefresh size={14} className="text-forest-900/55" /></button>
+        <button onClick={() => geo.detect(true)} className="w-9 h-9 rounded-lg flex items-center justify-center bg-warm-100 active:scale-90 transition-transform flex-shrink-0 min-h-[36px]"><IconRefresh size={14} className="text-forest-900/55" /></button>
       </div>
 
       {/* Pending trip prompt */}
@@ -417,11 +417,15 @@ export default function App() {
             <p className="text-xs mt-0.5 text-forest-900/55">
               {geo.status === 'detected' ? `Near ${nearbyStoreInfo?.name}` : geo.status === 'denied' ? 'Access denied' : geo.status === 'none_nearby' ? 'No stores nearby' : 'Idle'}
             </p>
-            <button onClick={geo.detect} className="mt-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-warm-100 text-forest-900/60">Refresh</button>
+            <button onClick={() => geo.detect(true)} className="mt-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-warm-100 text-forest-900/60">Refresh</button>
           </div>
 
-          {/* Kroger account connection */}
-          <KrogerConnectionCard />
+          {/* Kroger family account connection — chain-aware UI */}
+          <KrogerConnectionCard contextStoreId={
+            // Prefer nearby store if it's Kroger family, else first saved Kroger-family card
+            (nearbyStoreId && cards.some((c) => c.storeId === nearbyStoreId)) ? nearbyStoreId :
+            cards.find((c) => ['kroger','harristeeter','fredmeyer','ralphs','kingsoopers','frys','smiths','qfc','marianos','pickn','dillons','citymarket'].includes(c.storeId))?.storeId || null
+          } />
 
           {/* Data export/import */}
           <div className="p-3 rounded-xl card-surface">
