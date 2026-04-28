@@ -64,16 +64,28 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       codeVerifier: stateRow.code_verifier,
     });
 
+    // Validate required fields are present
+    if (!tokens.access_token) {
+      return htmlError('Kroger response missing access_token', '/');
+    }
+    if (!tokens.refresh_token) {
+      return htmlError('Kroger response missing refresh_token. Your app may not have offline_access enabled or the requested scopes do not support refresh tokens.', '/');
+    }
+
+    // Coerce optional fields to safe defaults for D1 bind
+    const tokenScope = tokens.scope || 'profile.compact';
+    const expiresIn = typeof tokens.expires_in === 'number' ? tokens.expires_in : 1800;
+
     // Create a new session row with the refresh token
     const sessionId = generateOpaqueToken();
     const refreshExpiresAt = new Date(Date.now() + SESSION_MAX_AGE_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
     await context.env.DB.prepare(
       'INSERT INTO kroger_sessions (session_id, refresh_token, refresh_expires_at, scope) VALUES (?, ?, ?, ?)'
-    ).bind(sessionId, tokens.refresh_token, refreshExpiresAt, tokens.scope).run();
+    ).bind(sessionId, tokens.refresh_token, refreshExpiresAt, tokenScope).run();
 
     // Cache access token in KV with TTL just below its expiry
-    const accessTtl = Math.max(60, tokens.expires_in - 60);
+    const accessTtl = Math.max(60, expiresIn - 60);
     try {
       await context.env.COUPON_CACHE.put(accessTokenKvKey(sessionId), tokens.access_token, {
         expirationTtl: accessTtl,
