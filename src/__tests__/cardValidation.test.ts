@@ -17,8 +17,8 @@ describe('getCardRule', () => {
     expect(rule.minLength).toBe(4);
   });
 
-  it('has rules for all 25 stores', () => {
-    const storeIds = ['kroger', 'safeway', 'walmart', 'target', 'costco', 'traderjoes', 'wholefds', 'aldi', 'publix', 'heb', 'wegmans', 'harristeeter', 'foodlion', 'giantfood', 'lidl', 'sprouts', 'lowesfoods', 'stopshop', 'hannaford', 'hyvee', 'meijer', 'shoprite', 'albertsons', 'winndixie', 'other'];
+  it('has rules for all 36 stores', () => {
+    const storeIds = ['kroger', 'safeway', 'walmart', 'target', 'costco', 'traderjoes', 'wholefds', 'aldi', 'publix', 'heb', 'wegmans', 'harristeeter', 'foodlion', 'giantfood', 'lidl', 'sprouts', 'lowesfoods', 'stopshop', 'hannaford', 'hyvee', 'meijer', 'shoprite', 'albertsons', 'winndixie', 'fredmeyer', 'ralphs', 'kingsoopers', 'frys', 'smiths', 'qfc', 'marianos', 'pickn', 'dillons', 'citymarket', 'other'];
     storeIds.forEach((id) => {
       const rule = getCardRule(id);
       expect(rule.storeId).toBe(id);

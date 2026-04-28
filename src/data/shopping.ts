@@ -10,6 +10,7 @@ export interface ShoppingItem {
   checked: boolean;
   dietaryTags: string[];
   matchedCouponIds: string[];
+  krogerUpc?: string;       // From Kroger Catalog API autocomplete
 }
 
 export interface ShoppingList {

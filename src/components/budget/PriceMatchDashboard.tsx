@@ -7,6 +7,7 @@ import {
 } from '../../data/priceMatch';
 import { checkKrogerPrices } from '../../lib/krogerService';
 import { getStore } from '../../data/stores';
+import { isKrogerFamily, getKrogerChainCode, KROGER_FAMILY } from '../../data/krogerFamily';
 import { generateId } from '../../lib/geo';
 
 interface Props {
@@ -34,21 +35,30 @@ export function PriceMatchDashboard({ purchases, opportunities, onAddOpportunity
 
   const summary = useMemo(() => calculateSummary(opportunities), [opportunities]);
 
-  // Filter purchases eligible for scanning (within Kroger 14-day window)
-  const krogerPurchases = useMemo(() => {
-    return purchases.filter((p) => p.storeId === 'kroger' && isWithinRefundWindow(p.date, 'kroger'));
+  // Filter purchases eligible for scanning (any Kroger-family store within its 14-day window)
+  const krogerFamilyPurchases = useMemo(() => {
+    return purchases.filter((p) => isKrogerFamily(p.storeId) && isWithinRefundWindow(p.date, p.storeId));
   }, [purchases]);
+
+  // Group eligible receipts by store for the user-facing summary
+  const eligibleByStore = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of krogerFamilyPurchases) {
+      map.set(p.storeId, (map.get(p.storeId) || 0) + 1);
+    }
+    return map;
+  }, [krogerFamilyPurchases]);
 
   // Manual entry: get current purchase to attach to
   const manualPurchase = manualPurchaseId ? purchases.find((p) => p.id === manualPurchaseId) : null;
 
   const runKrogerScan = async () => {
     if (!zipCode || !/^\d{5}$/.test(zipCode)) {
-      alert('Please set your zip code first to enable Kroger price checks.');
+      alert('Please set your zip code first to enable Kroger-family price checks.');
       return;
     }
-    if (krogerPurchases.length === 0) {
-      alert('No Kroger purchases within the 14-day refund window. Scan a Kroger receipt first.');
+    if (krogerFamilyPurchases.length === 0) {
+      alert('No Kroger-family receipts (Kroger, Harris Teeter, Fred Meyer, Ralphs, etc.) within the refund window.');
       return;
     }
 
@@ -57,10 +67,14 @@ export function PriceMatchDashboard({ purchases, opportunities, onAddOpportunity
     let foundCount = 0;
     let totalSavings = 0;
 
-    for (const purchase of krogerPurchases) {
-      setScanProgress(`Checking ${purchase.items.length} items from ${new Date(purchase.date).toLocaleDateString()}…`);
+    for (const purchase of krogerFamilyPurchases) {
+      const store = getStore(purchase.storeId);
+      const chainCode = getKrogerChainCode(purchase.storeId);
+      if (!chainCode) continue;
+
+      setScanProgress(`Checking ${purchase.items.length} items from ${store?.name || purchase.storeName} (${new Date(purchase.date).toLocaleDateString()})…`);
       const items = purchase.items.map((i) => ({ name: i.name }));
-      const results = await checkKrogerPrices(items, zipCode);
+      const results = await checkKrogerPrices(items, zipCode, chainCode);
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
@@ -72,11 +86,9 @@ export function PriceMatchDashboard({ purchases, opportunities, onAddOpportunity
 
         const paidPerUnit = item.unitPrice;
         if (currentPrice < paidPerUnit - 0.05) {
-          // Price drop detected — calculate refund based on quantity
           const refund = (paidPerUnit - currentPrice) * item.quantity;
-          if (refund < 0.25) continue; // skip trivial differences
+          if (refund < 0.25) continue;
 
-          // Check we haven't already detected this exact opportunity
           const alreadyExists = opportunities.some(
             (op) => op.purchaseId === purchase.id && op.itemName === item.name && op.status === 'pending'
           );
@@ -86,8 +98,8 @@ export function PriceMatchDashboard({ purchases, opportunities, onAddOpportunity
             id: generateId(),
             purchaseId: purchase.id,
             itemName: item.name,
-            storeId: 'kroger',
-            storeName: 'Kroger',
+            storeId: purchase.storeId,
+            storeName: purchase.storeName,
             pricePaid: paidPerUnit,
             currentPrice,
             potentialRefund: refund,
@@ -249,13 +261,13 @@ export function PriceMatchDashboard({ purchases, opportunities, onAddOpportunity
           </div>
         )}
 
-        {/* ─── Auto Scan (Kroger) ─── */}
+        {/* ─── Auto Scan (Kroger Family) ─── */}
         {view === 'scan' && (
           <div className="space-y-4 animate-fade-in">
             <div className="p-4 rounded-xl card-surface">
               <p className="text-sm font-bold text-forest-900 mb-1">Auto Scan with Kroger API</p>
               <p className="text-[11px] text-forest-900/55 leading-relaxed">
-                Compare your recent Kroger purchases against current shelf prices. CartKey will flag items that are now cheaper than what you paid, within the 14-day refund window.
+                Compare your recent Kroger-family receipts against current shelf prices. Works for Kroger, Harris Teeter, Fred Meyer, Ralphs, King Soopers, Fry's, Smith's, QFC, Mariano's, Pick 'n Save, Dillons, and City Market.
               </p>
             </div>
 
@@ -265,16 +277,29 @@ export function PriceMatchDashboard({ purchases, opportunities, onAddOpportunity
                 inputMode="numeric"
                 className="w-full px-4 py-3 rounded-lg border border-warm-200 bg-white mt-1.5 outline-none focus:border-brass-400 transition-colors font-mono"
                 maxLength={5} />
-              <p className="text-[11px] text-forest-900/55 mt-1">Used to find your nearest Kroger store for price lookups.</p>
+              <p className="text-[11px] text-forest-900/55 mt-1">Used to find your nearest store of each chain.</p>
             </div>
 
             <div className="p-3 rounded-xl bg-warm-100">
               <p className="text-[11px] font-semibold text-forest-900/55 uppercase tracking-wider mb-1">Eligible Receipts</p>
-              <p className="text-sm font-bold text-forest-900">{krogerPurchases.length} Kroger receipt{krogerPurchases.length !== 1 ? 's' : ''}</p>
-              <p className="text-[11px] text-forest-900/55">Within the 14-day refund window</p>
+              <p className="text-sm font-bold text-forest-900">{krogerFamilyPurchases.length} receipt{krogerFamilyPurchases.length !== 1 ? 's' : ''}</p>
+              {eligibleByStore.size > 0 ? (
+                <div className="mt-2 space-y-1">
+                  {Array.from(eligibleByStore.entries()).map(([storeId, count]) => {
+                    const store = getStore(storeId);
+                    return (
+                      <p key={storeId} className="text-[11px] text-forest-900/60">
+                        <span className="mr-1">{store?.icon}</span>{store?.name}: {count}
+                      </p>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-[11px] text-forest-900/55 mt-0.5">Within the 14-day refund window</p>
+              )}
             </div>
 
-            <button onClick={runKrogerScan} disabled={scanning || krogerPurchases.length === 0 || !zipCode}
+            <button onClick={runKrogerScan} disabled={scanning || krogerFamilyPurchases.length === 0 || !zipCode}
               className="w-full py-3.5 rounded-xl bg-forest-900 text-brass-100 font-semibold text-base disabled:opacity-40 transition-opacity min-h-[52px]">
               {scanning ? 'Scanning…' : 'Run Price Check'}
             </button>
@@ -290,7 +315,7 @@ export function PriceMatchDashboard({ purchases, opportunities, onAddOpportunity
             <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
               <p className="text-[11px] font-semibold text-amber-700 mb-1">Other Stores</p>
               <p className="text-[11px] text-forest-900/60 leading-relaxed">
-                Auto-scan currently works for Kroger and Harris Teeter only. For other stores, use the Manual tab to enter a price drop you spotted in a weekly ad or on the store's website.
+                Auto Scan works for the {KROGER_FAMILY.length} Kroger-family banners listed above. For other stores, use the Manual tab to enter a price drop you spotted in a weekly ad or on the store's website.
               </p>
             </div>
           </div>

@@ -58,6 +58,20 @@ CartKey loads two external resources at runtime:
 
 The Coupon Hub feature contains links to retailer websites (Kroger, Safeway, etc.). When you tap one of these links, you leave CartKey and arrive at that retailer's site, which has its own privacy practices.
 
+## Optional Kroger Account Connection
+
+CartKey offers an optional feature to connect your Kroger account (which also covers Harris Teeter, Fred Meyer, Ralphs, and other Kroger-owned banners). This feature is opt-in — by default, no connection is made.
+
+If you choose to connect:
+
+- You're redirected to Kroger's official authorization page, where you log in with your Kroger credentials. **CartKey never sees or stores your Kroger username or password.**
+- After you authorize, Kroger sends CartKey a short-lived access token and a longer-lived refresh token.
+- The refresh token is stored encrypted at rest in CartKey's Cloudflare D1 database, identified only by an opaque random session ID stored in an HttpOnly cookie on your device. There is no email address, name, or other personal identifier associated with the session.
+- Access tokens expire after 30 minutes and are cached in CartKey's KV store keyed by session ID, then auto-refreshed via the refresh token.
+- The connection grants CartKey read access to your Kroger profile (loyalty card barcode, profile ID) and write access for adding items to your Kroger online cart.
+
+If you tap "Disconnect Kroger" in your profile, CartKey deletes the session record from D1 and clears the cookie. The tokens become useless. Note: Kroger does not currently offer an explicit token revocation endpoint, so the actual token strings expire naturally on Kroger's side.
+
 ## Data Export and Deletion
 
 You can export all of your CartKey data as a JSON file at any time through Profile → Data & Backup → Export Backup.

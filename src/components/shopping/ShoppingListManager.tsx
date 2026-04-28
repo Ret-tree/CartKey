@@ -2,14 +2,20 @@ import { useState, useMemo } from 'react';
 import type { ShoppingList, ShoppingItem } from '../../data/shopping';
 import { autoCategory, GROCERY_CATEGORIES, UNITS } from '../../data/shopping';
 import { generateId } from '../../lib/geo';
+import { useCatalogAutocomplete } from '../../hooks/useCatalogAutocomplete';
+import { addToKrogerCart } from '../../lib/krogerService';
+import { isKrogerFamily, getKrogerChainCode } from '../../data/krogerFamily';
 
 interface Props {
   lists: ShoppingList[];
   onUpdateLists: (lists: ShoppingList[]) => void;
   onFinishTrip?: () => void;
+  zipCode?: string;
+  krogerConnected?: boolean;
+  nearbyStoreId?: string | null;
 }
 
-export function ShoppingListManager({ lists, onUpdateLists, onFinishTrip }: Props) {
+export function ShoppingListManager({ lists, onUpdateLists, onFinishTrip, zipCode = '', krogerConnected = false, nearbyStoreId = null }: Props) {
   const [activeListId, setActiveListId] = useState<string | null>(lists[0]?.id ?? null);
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState('');
@@ -32,15 +38,55 @@ export function ShoppingListManager({ lists, onUpdateLists, onFinishTrip }: Prop
     if (activeListId === id) setActiveListId(updated[0]?.id ?? null);
   };
 
-  const addItem = () => {
-    if (!newItemText.trim() || !activeList) return;
-    const cat = autoCategory(newItemText);
+  // ─── Kroger autocomplete ───
+  const { suggestions, loading: suggLoading } = useCatalogAutocomplete(newItemText, zipCode);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // ─── Send to Kroger state ───
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState<string | null>(null);
+
+  const addItem = (override?: { name: string; upc?: string; category?: string }) => {
+    const text = override?.name || newItemText.trim();
+    if (!text || !activeList) return;
+    const cat = override?.category || autoCategory(text);
     const item: ShoppingItem = {
-      id: generateId(), name: newItemText.trim(), quantity: 1, unit: '',
+      id: generateId(), name: text, quantity: 1, unit: '',
       category: cat, checked: false, dietaryTags: [], matchedCouponIds: [],
+      ...(override?.upc ? { krogerUpc: override.upc } : {}),
     };
     updateList({ ...activeList, items: [...activeList.items, item] });
     setNewItemText('');
+    setShowSuggestions(false);
+  };
+
+  const sendToKroger = async () => {
+    if (!activeList || !krogerConnected) return;
+    const items = activeList.items
+      .filter((i) => !i.checked)
+      .map((i) => ({ name: i.name, upc: i.krogerUpc, quantity: i.quantity }));
+
+    if (items.length === 0) {
+      setSendResult('No unchecked items to send');
+      return;
+    }
+
+    setSending(true);
+    setSendResult(null);
+    const chainCode = nearbyStoreId && isKrogerFamily(nearbyStoreId)
+      ? getKrogerChainCode(nearbyStoreId) || 'KROGER'
+      : 'KROGER';
+    const result = await addToKrogerCart(items, zipCode, chainCode);
+    setSending(false);
+
+    if (result.success) {
+      setSendResult(`Sent ${result.addedCount} of ${items.length} items to your Kroger cart`);
+    } else if (result.addedCount > 0) {
+      setSendResult(`Partial: added ${result.addedCount} of ${items.length}. ${result.error || ''}`);
+    } else {
+      setSendResult(result.error || 'Failed to send to Kroger');
+    }
+    setTimeout(() => setSendResult(null), 6000);
   };
 
   const updateList = (list: ShoppingList) => {
@@ -101,15 +147,71 @@ export function ShoppingListManager({ lists, onUpdateLists, onFinishTrip }: Prop
             <span className="text-gray-400">{uncheckedCount} items left</span>
           </div>
 
-          {/* Add item */}
-          <div className="flex gap-2 mb-4">
-            <input type="text" placeholder="Add item..." value={newItemText}
-              onChange={(e) => setNewItemText(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addItem()}
-              className="flex-1 px-3 py-2.5 rounded-xl text-sm border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-forest-500/20" />
-            <button onClick={addItem} disabled={!newItemText.trim()}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-forest-600 disabled:opacity-40">Add</button>
+          {/* Add item with Kroger autocomplete */}
+          <div className="relative mb-4">
+            <div className="flex gap-2">
+              <input type="text" placeholder="Add item..." value={newItemText}
+                onChange={(e) => { setNewItemText(e.target.value); setShowSuggestions(true); }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                onKeyDown={(e) => e.key === 'Enter' && addItem()}
+                className="flex-1 px-3 py-2.5 rounded-xl text-sm border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-forest-500/20"
+                autoComplete="off" />
+              <button onClick={() => addItem()} disabled={!newItemText.trim()}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-forest-600 disabled:opacity-40">Add</button>
+            </div>
+
+            {/* Autocomplete dropdown */}
+            {showSuggestions && (suggestions.length > 0 || suggLoading) && (
+              <div className="absolute top-full left-0 right-0 mt-1 rounded-xl card-surface shadow-lg z-10 overflow-hidden max-h-72 overflow-y-auto">
+                {suggLoading && suggestions.length === 0 && (
+                  <p className="px-3 py-2 text-[11px] text-forest-900/55 italic">Searching Kroger…</p>
+                )}
+                {suggestions.map((s) => (
+                  <button key={s.upc} onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => addItem({ name: s.productName, upc: s.upc, category: s.category || autoCategory(s.productName) })}
+                    className="w-full flex items-center gap-3 p-2.5 hover:bg-warm-100 transition-colors text-left border-b border-warm-200 last:border-b-0">
+                    {s.imageUrl ? (
+                      <img src={s.imageUrl} alt="" className="w-10 h-10 rounded object-contain bg-white flex-shrink-0" />
+                    ) : (
+                      <div className="w-10 h-10 rounded bg-warm-100 flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-forest-900 truncate">{s.productName}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        {s.brand && <span className="text-[10px] text-forest-900/55 truncate">{s.brand}</span>}
+                        {s.size && <span className="text-[10px] text-forest-900/40">· {s.size}</span>}
+                        {s.salePrice && (
+                          <span className="text-[10px] font-bold text-green-700 ml-auto">${s.salePrice.toFixed(2)}</span>
+                        )}
+                        {!s.salePrice && s.regularPrice && (
+                          <span className="text-[10px] font-semibold text-forest-900/70 ml-auto">${s.regularPrice.toFixed(2)}</span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+                <p className="px-3 py-1.5 text-[10px] text-forest-900/40 text-center bg-warm-100/50">Powered by Kroger Catalog</p>
+              </div>
+            )}
           </div>
+
+          {/* Send to Kroger button */}
+          {krogerConnected && activeList && activeList.items.filter((i) => !i.checked).length > 0 && (
+            <div className="mb-3">
+              <button onClick={sendToKroger} disabled={sending}
+                className="w-full py-2.5 rounded-lg bg-forest-900 text-brass-100 text-xs font-semibold disabled:opacity-50 min-h-[40px] flex items-center justify-center gap-2">
+                {sending ? (
+                  <>Sending to Kroger…</>
+                ) : (
+                  <>🛒 Send to Kroger Cart ({activeList.items.filter((i) => !i.checked).length} items)</>
+                )}
+              </button>
+              {sendResult && (
+                <p className="text-[11px] text-center mt-1.5 text-forest-900/70 animate-fade-in">{sendResult}</p>
+              )}
+            </div>
+          )}
 
           {/* Items grouped by category */}
           {Object.keys(grouped).length === 0 ? (

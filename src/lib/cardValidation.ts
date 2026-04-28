@@ -36,6 +36,16 @@ const CARD_RULES: Record<string, CardFormatRule> = {
   shoprite: { storeId: 'shoprite', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Price Plus Club number', example: '0123456789' },
   albertsons: { storeId: 'albertsons', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Albertsons for U number', example: '0123456789' },
   winndixie: { storeId: 'winndixie', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Winn-Dixie Rewards number', example: '0123456789' },
+  fredmeyer:    { storeId: 'fredmeyer',    digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Fred Meyer Rewards (Plus Card)',  example: '0123456789' },
+  ralphs:       { storeId: 'ralphs',       digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Ralphs Rewards (Plus Card)',      example: '0123456789' },
+  kingsoopers:  { storeId: 'kingsoopers',  digitsOnly: true, minLength: 10, maxLength: 13, hint: 'King Soopers SooperCard',         example: '0123456789' },
+  frys:         { storeId: 'frys',         digitsOnly: true, minLength: 10, maxLength: 13, hint: "Fry's V.I.P. Card",                example: '0123456789' },
+  smiths:       { storeId: 'smiths',       digitsOnly: true, minLength: 10, maxLength: 13, hint: "Smith's Fresh Values card",        example: '0123456789' },
+  qfc:          { storeId: 'qfc',          digitsOnly: true, minLength: 10, maxLength: 13, hint: 'QFC Advantage Card',               example: '0123456789' },
+  marianos:     { storeId: 'marianos',     digitsOnly: true, minLength: 10, maxLength: 13, hint: "Mariano's Rewards card",           example: '0123456789' },
+  pickn:        { storeId: 'pickn',        digitsOnly: true, minLength: 10, maxLength: 13, hint: "Pick 'n Save MVP Card",            example: '0123456789' },
+  dillons:      { storeId: 'dillons',      digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Dillons Plus card',                example: '0123456789' },
+  citymarket:   { storeId: 'citymarket',   digitsOnly: true, minLength: 10, maxLength: 13, hint: 'City Market Value Card',           example: '0123456789' },
   other: { storeId: 'other', digitsOnly: false, minLength: 4, maxLength: 30, hint: 'Your loyalty card number', example: '1234567890' },
 };
 

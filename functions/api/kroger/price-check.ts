@@ -14,6 +14,7 @@ interface Env {
 interface PriceCheckRequest {
   items: { name: string; upc?: string }[];
   zip: string;
+  chain?: string; // Kroger API chain code, e.g. KROGER, HARRIS_TEETER, FRED_MEYER
 }
 
 interface PriceCheckResult {
@@ -49,8 +50,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const client = new KrogerClient(context.env.KROGER_CLIENT_ID, context.env.KROGER_CLIENT_SECRET);
 
-    // Find nearest store (cached)
-    const locCacheKey = `kroger:loc:${body.zip}`;
+    // Find nearest store of the specified chain (cached per-chain)
+    const chain = body.chain || 'KROGER';
+    const locCacheKey = `kroger:loc:${chain}:${body.zip}`;
     let locationId: string | null = null;
     try {
       const cached = await context.env.COUPON_CACHE.get(locCacheKey);
@@ -58,7 +60,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     } catch {}
 
     if (!locationId) {
-      const locations = await client.findLocations(body.zip, 25, 1);
+      const locations = await client.findLocations(body.zip, 25, 1, chain);
       if (locations.length === 0) {
         return jsonResponse({ results: body.items.map((i) => ({ itemName: i.name, matched: false })), locationId: null });
       }

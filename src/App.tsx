@@ -17,6 +17,8 @@ import { PriceMatchDashboard } from './components/budget/PriceMatchDashboard';
 import type { PriceMatchOpportunity } from './data/priceMatch';
 import { CheckoutMode } from './components/checkout/CheckoutMode';
 import { UpdatePrompt } from './components/UpdatePrompt';
+import { KrogerConnectionCard } from './components/profile/KrogerConnectionCard';
+import { getKrogerConnectionStatus } from './lib/krogerService';
 import { IconHome, IconList, IconTag, IconWallet, IconUser, IconPlus, IconCalendar, IconBarcode, IconRefresh, IconBell, IconChart, IconLocation } from './components/Icons';
 import type { LoyaltyCard, DietaryProfile, AppNotification, ManualCoupon } from './lib/types';
 import type { ShoppingList, PantryItem } from './data/shopping';
@@ -43,6 +45,16 @@ export default function App() {
   const [pendingTrip, setPendingTrip, pendingTripLoaded] = useStorage<{ listId: string; storeName: string; checkedAt: string } | null>('ck:pendingTrip', null);
   const [priceMatches, setPriceMatches, priceMatchesLoaded] = useStorage<PriceMatchOpportunity[]>('ck:priceMatches', []);
   const [zipCode, setZipCode, zipLoaded] = useStorage<string>('ck:zip', '');
+  const [krogerConnected, setKrogerConnected] = useState(false);
+
+  // Check Kroger connection status on mount and when returning from OAuth
+  useEffect(() => {
+    let cancelled = false;
+    getKrogerConnectionStatus().then((s) => { if (!cancelled) setKrogerConnected(s.connected); });
+    const handle = () => getKrogerConnectionStatus().then((s) => setKrogerConnected(s.connected));
+    window.addEventListener('focus', handle);
+    return () => { cancelled = true; window.removeEventListener('focus', handle); };
+  }, []);
 
   // ─── Local State ───
   const [tab, setTab] = useState<TabId>('home');
@@ -408,6 +420,9 @@ export default function App() {
             <button onClick={geo.detect} className="mt-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-warm-100 text-forest-900/60">Refresh</button>
           </div>
 
+          {/* Kroger account connection */}
+          <KrogerConnectionCard />
+
           {/* Data export/import */}
           <div className="p-3 rounded-xl card-surface">
             <p className="text-sm font-semibold text-forest-900">Data & Backup</p>
@@ -477,7 +492,7 @@ export default function App() {
             </button>
           </div>
         </div>
-        {listsSubTab === 'lists' && <ShoppingListManager lists={shoppingLists} onUpdateLists={setShoppingLists} onFinishTrip={nearbyCard ? () => setShowCheckout(true) : undefined} />}
+        {listsSubTab === 'lists' && <ShoppingListManager lists={shoppingLists} onUpdateLists={setShoppingLists} onFinishTrip={nearbyCard ? () => setShowCheckout(true) : undefined} zipCode={zipCode} krogerConnected={krogerConnected} nearbyStoreId={nearbyStoreId} />}
         {listsSubTab === 'meals' && <MealPlanner pantryItems={pantryItems} onGenerateList={handleGenerateList} />}
         {listsSubTab === 'pantry' && <PantryTracker items={pantryItems} onUpdate={setPantryItems} />}
       </div>

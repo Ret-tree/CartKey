@@ -66,12 +66,13 @@ export class KrogerClient {
     return this.accessToken;
   }
 
-  async findLocations(zipCode: string, radiusMiles = 10, limit = 10): Promise<KrogerLocation[]> {
+  async findLocations(zipCode: string, radiusMiles = 10, limit = 10, chain?: string): Promise<KrogerLocation[]> {
     const token = await this.getToken();
     const url = new URL(`${KROGER_BASE}/locations`);
     url.searchParams.set('filter.zipCode.near', zipCode);
     url.searchParams.set('filter.radiusInMiles', String(radiusMiles));
     url.searchParams.set('filter.limit', String(limit));
+    if (chain) url.searchParams.set('filter.chain', chain);
 
     const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
     if (!response.ok) throw new Error(`Kroger locations failed: ${response.status}`);
