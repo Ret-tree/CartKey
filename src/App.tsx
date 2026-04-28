@@ -3,7 +3,6 @@ import { useStorage } from './hooks/useStorage';
 import { useGeolocation } from './hooks/useGeolocation';
 import { STORES, getStore } from './data/stores';
 import { DIETARY_TYPES, ALLERGENS } from './data/dietary';
-import { MOCK_NOTIFICATIONS } from './data/coupons';
 import { OnboardingFlow } from './components/onboarding/OnboardingFlow';
 import { BarcodeDisplay } from './components/cards/BarcodeDisplay';
 import { AddCardModal, CardDetail } from './components/cards/CardModals';
@@ -33,7 +32,7 @@ export default function App() {
   const [profile, setProfile, profileLoaded] = useStorage<DietaryProfile>('ck:profile', { diet: '', allergens: [], customExclusions: '' });
   const [onboarded, setOnboarded, onbLoaded] = useStorage<boolean>('ck:onboarded', false);
   const [manualCoupons, setManualCoupons, couponsLoaded] = useStorage<ManualCoupon[]>('ck:manualCoupons', []);
-  const [notifications, setNotifications, notifsLoaded] = useStorage<AppNotification[]>('ck:notifs', MOCK_NOTIFICATIONS);
+  const [notifications, setNotifications, notifsLoaded] = useStorage<AppNotification[]>('ck:notifs', []);
   const [shoppingLists, setShoppingLists, listsLoaded] = useStorage<ShoppingList[]>('ck:lists', []);
   const [pantryItems, setPantryItems, pantryLoaded] = useStorage<PantryItem[]>('ck:pantry', []);
   const [budgetConfig, setBudgetConfig, budgetLoaded] = useStorage<BudgetConfig>('ck:budget', DEFAULT_BUDGET);
@@ -441,7 +440,7 @@ export default function App() {
             <p className="text-xs mt-0.5 text-forest-900/55">CartKey v1.0.0 · MIT License · grocery.blackatlas.tech</p>
           </div>
 
-          <button onClick={() => { if (confirm('Reset all data? This cannot be undone.')) { setCards([]); setProfile({ diet: '', allergens: [], customExclusions: '' }); setManualCoupons([]); setNotifications(MOCK_NOTIFICATIONS); setShoppingLists([]); setPantryItems([]); setBudgetConfig(DEFAULT_BUDGET); setPurchases([]); setPendingTrip(null); setTheme('light'); setOnboarded(false); } }}
+          <button onClick={() => { if (confirm('Reset all data? This cannot be undone.')) { setCards([]); setProfile({ diet: '', allergens: [], customExclusions: '' }); setManualCoupons([]); setNotifications([]); setShoppingLists([]); setPantryItems([]); setBudgetConfig(DEFAULT_BUDGET); setPurchases([]); setPendingTrip(null); setTheme('light'); setOnboarded(false); } }}
             className="w-full p-3 rounded-xl border border-red-200 bg-red-50 text-left">
             <p className="text-sm font-semibold text-red-600">Reset All Data</p>
           </button>

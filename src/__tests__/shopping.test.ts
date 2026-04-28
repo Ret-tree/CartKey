@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   autoCategory, parseIngredient, aggregateIngredients, matchItemToCoupons,
 } from '../data/shopping';
-import { MOCK_COUPONS } from '../data/coupons';
+import { TEST_COUPONS } from './fixtures/coupons';
 
 describe('autoCategory', () => {
   it('categorizes produce items', () => {
@@ -99,23 +99,23 @@ describe('aggregateIngredients', () => {
 
 describe('matchItemToCoupons', () => {
   it('finds matching coupons for a product', () => {
-    const matches = matchItemToCoupons('spinach', MOCK_COUPONS);
+    const matches = matchItemToCoupons('spinach', TEST_COUPONS);
     expect(matches.length).toBeGreaterThan(0);
-    expect(matches).toContain('c001'); // Organic Baby Spinach coupon
+    expect(matches).toContain('t002'); // Spinach coupon
   });
 
   it('matches by brand name', () => {
-    const matches = matchItemToCoupons('Chobani', MOCK_COUPONS);
-    expect(matches).toContain('c010');
+    const matches = matchItemToCoupons('Chobani', TEST_COUPONS);
+    expect(matches).toContain('t001'); // Chobani coupon
   });
 
   it('returns empty for unmatched items', () => {
-    const matches = matchItemToCoupons('uranium rods', MOCK_COUPONS);
+    const matches = matchItemToCoupons('uranium rods', TEST_COUPONS);
     expect(matches).toHaveLength(0);
   });
 
   it('handles case insensitivity', () => {
-    const matches = matchItemToCoupons('OATLY', MOCK_COUPONS);
-    expect(matches).toContain('c011');
+    const matches = matchItemToCoupons('OATLY', TEST_COUPONS);
+    expect(matches).toContain('t004'); // Oatly coupon
   });
 });

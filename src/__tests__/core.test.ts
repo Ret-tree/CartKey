@@ -3,12 +3,13 @@ import { encodeCode128B } from '../lib/barcode';
 import { getDistance, findNearestStore, generateId } from '../lib/geo';
 import {
   filterCouponsByStore, filterCouponsByDiet, filterCouponsByCategory,
-  sortCoupons, isExpiringSoon, isExpired, formatDiscount, MOCK_COUPONS,
+  sortCoupons, isExpiringSoon, isExpired, formatDiscount,
 } from '../data/coupons';
 import { DIET_EXCLUSIONS } from '../data/dietary';
 import { STORES } from '../data/stores';
 import { STORE_LOCATIONS, findNearestLocation } from '../data/storeLocations';
 import type { Coupon } from '../lib/types';
+import { TEST_COUPONS } from './fixtures/coupons';
 
 // ─── Barcode Encoder ───
 describe('encodeCode128B', () => {
@@ -110,18 +111,18 @@ describe('generateId', () => {
 // ─── Coupon Filtering ───
 describe('filterCouponsByStore', () => {
   it('filters coupons by store ID', () => {
-    const result = filterCouponsByStore(MOCK_COUPONS, 'kroger');
+    const result = filterCouponsByStore(TEST_COUPONS, 'kroger');
     expect(result.length).toBeGreaterThan(0);
     result.forEach((c) => expect(c.retailerIds).toContain('kroger'));
   });
 
   it('returns empty for unknown store', () => {
-    const result = filterCouponsByStore(MOCK_COUPONS, 'nonexistent');
+    const result = filterCouponsByStore(TEST_COUPONS, 'nonexistent');
     expect(result).toHaveLength(0);
   });
 
   it('a coupon available at multiple stores appears for each', () => {
-    const c = MOCK_COUPONS.find((c) => c.retailerIds.length > 3)!;
+    const c = TEST_COUPONS.find((c) => c.retailerIds.length > 3)!;
     c.retailerIds.forEach((storeId) => {
       const result = filterCouponsByStore([c], storeId);
       expect(result).toHaveLength(1);
@@ -131,7 +132,7 @@ describe('filterCouponsByStore', () => {
 
 describe('filterCouponsByDiet', () => {
   it('filters out dairy coupons for vegan diet', () => {
-    const result = filterCouponsByDiet(MOCK_COUPONS, 'vegan', [], DIET_EXCLUSIONS);
+    const result = filterCouponsByDiet(TEST_COUPONS, 'vegan', [], DIET_EXCLUSIONS);
     result.forEach((c) => {
       expect(c.allergens).not.toContain('dairy');
       expect(c.allergens).not.toContain('eggs');
@@ -139,7 +140,7 @@ describe('filterCouponsByDiet', () => {
   });
 
   it('filters out explicit allergens', () => {
-    const result = filterCouponsByDiet(MOCK_COUPONS, '', ['gluten', 'peanuts'], DIET_EXCLUSIONS);
+    const result = filterCouponsByDiet(TEST_COUPONS, '', ['gluten', 'peanuts'], DIET_EXCLUSIONS);
     result.forEach((c) => {
       expect(c.allergens).not.toContain('gluten');
       expect(c.allergens).not.toContain('peanuts');
@@ -148,7 +149,7 @@ describe('filterCouponsByDiet', () => {
 
   it('combines diet exclusions with explicit allergens', () => {
     // Vegan (excludes dairy, eggs) + explicit gluten allergy
-    const result = filterCouponsByDiet(MOCK_COUPONS, 'vegan', ['gluten'], DIET_EXCLUSIONS);
+    const result = filterCouponsByDiet(TEST_COUPONS, 'vegan', ['gluten'], DIET_EXCLUSIONS);
     result.forEach((c) => {
       expect(c.allergens).not.toContain('dairy');
       expect(c.allergens).not.toContain('eggs');
@@ -157,50 +158,50 @@ describe('filterCouponsByDiet', () => {
   });
 
   it('returns all coupons when no restrictions', () => {
-    const result = filterCouponsByDiet(MOCK_COUPONS, '', [], DIET_EXCLUSIONS);
-    expect(result).toHaveLength(MOCK_COUPONS.length);
+    const result = filterCouponsByDiet(TEST_COUPONS, '', [], DIET_EXCLUSIONS);
+    expect(result).toHaveLength(TEST_COUPONS.length);
   });
 
   it('returns all coupons for omnivore diet', () => {
-    const result = filterCouponsByDiet(MOCK_COUPONS, 'omnivore', [], DIET_EXCLUSIONS);
-    expect(result).toHaveLength(MOCK_COUPONS.length);
+    const result = filterCouponsByDiet(TEST_COUPONS, 'omnivore', [], DIET_EXCLUSIONS);
+    expect(result).toHaveLength(TEST_COUPONS.length);
   });
 });
 
 describe('filterCouponsByCategory', () => {
   it('returns all coupons for "all" category', () => {
-    expect(filterCouponsByCategory(MOCK_COUPONS, 'all')).toHaveLength(MOCK_COUPONS.length);
+    expect(filterCouponsByCategory(TEST_COUPONS, 'all')).toHaveLength(TEST_COUPONS.length);
   });
 
   it('filters by specific category', () => {
-    const produce = filterCouponsByCategory(MOCK_COUPONS, 'produce');
+    const produce = filterCouponsByCategory(TEST_COUPONS, 'produce');
     expect(produce.length).toBeGreaterThan(0);
     produce.forEach((c) => expect(c.categories).toContain('produce'));
   });
 
   it('returns empty for category with no coupons', () => {
-    const result = filterCouponsByCategory(MOCK_COUPONS, 'nonexistent');
+    const result = filterCouponsByCategory(TEST_COUPONS, 'nonexistent');
     expect(result).toHaveLength(0);
   });
 });
 
 describe('sortCoupons', () => {
   it('sorts by discount value descending', () => {
-    const sorted = sortCoupons(MOCK_COUPONS, 'discount');
+    const sorted = sortCoupons(TEST_COUPONS, 'value');
     for (let i = 1; i < sorted.length; i++) {
       expect(sorted[i - 1].discountValue).toBeGreaterThanOrEqual(sorted[i].discountValue);
     }
   });
 
   it('sorts by expiration ascending', () => {
-    const sorted = sortCoupons(MOCK_COUPONS, 'expiring');
+    const sorted = sortCoupons(TEST_COUPONS, 'expiring');
     for (let i = 1; i < sorted.length; i++) {
       expect(new Date(sorted[i - 1].validUntil).getTime()).toBeLessThanOrEqual(new Date(sorted[i].validUntil).getTime());
     }
   });
 
   it('sorts by popularity descending', () => {
-    const sorted = sortCoupons(MOCK_COUPONS, 'popular');
+    const sorted = sortCoupons(TEST_COUPONS, 'popular');
     for (let i = 1; i < sorted.length; i++) {
       expect(sorted[i - 1].upvotes).toBeGreaterThanOrEqual(sorted[i].upvotes);
     }
