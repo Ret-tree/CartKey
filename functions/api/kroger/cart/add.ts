@@ -8,7 +8,7 @@
 // in the response so the UI can show the user what couldn't be added.
 
 import { getUserAccessToken } from '../../_user-token';
-import { KrogerClient } from '../_kroger-client';
+import { KrogerClient } from '../../_kroger-client';
 
 interface Env {
   KROGER_CLIENT_ID: string;

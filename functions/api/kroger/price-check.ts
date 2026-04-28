@@ -3,7 +3,7 @@
 // Returns current Kroger pricing for matched products
 // Used by the price match feature to compare receipts against current shelf prices
 
-import { KrogerClient } from './_kroger-client';
+import { KrogerClient } from '../_kroger-client';
 
 interface Env {
   KROGER_CLIENT_ID: string;

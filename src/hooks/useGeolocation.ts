@@ -32,7 +32,7 @@ export function useGeolocation() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        const location = findNearestLocation(latitude, longitude, 1000);
+        const location = findNearestLocation(latitude, longitude, 4000);
         const store = location ? getStore(location.chainId) || null : null;
 
         setState({

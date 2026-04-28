@@ -4,7 +4,7 @@
 //
 // Cached in KV for 24 hours per (query, location).
 
-import { KrogerClient } from '../_kroger-client';
+import { KrogerClient } from '../../_kroger-client';
 
 interface Env {
   KROGER_CLIENT_ID: string;

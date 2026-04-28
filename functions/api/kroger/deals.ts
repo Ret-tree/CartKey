@@ -1,7 +1,7 @@
 // GET /api/kroger/deals?zip=22554&category=produce
 // Returns current Kroger sale items near a zip code, cached in KV for 6 hours
 
-import { KrogerClient, mapProductsToDeals, type KrogerDeal } from './_kroger-client';
+import { KrogerClient, mapProductsToDeals, type KrogerDeal } from '../_kroger-client';
 
 interface Env {
   KROGER_CLIENT_ID: string;
