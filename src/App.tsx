@@ -3,13 +3,11 @@ import { useStorage } from './hooks/useStorage';
 import { useGeolocation } from './hooks/useGeolocation';
 import { STORES, getStore } from './data/stores';
 import { DIETARY_TYPES, ALLERGENS } from './data/dietary';
-import { MOCK_COUPONS, MOCK_NOTIFICATIONS, filterCouponsByStore, filterCouponsByDiet } from './data/coupons';
-import { DIET_EXCLUSIONS } from './data/dietary';
+import { MOCK_NOTIFICATIONS } from './data/coupons';
 import { OnboardingFlow } from './components/onboarding/OnboardingFlow';
 import { BarcodeDisplay } from './components/cards/BarcodeDisplay';
 import { AddCardModal, CardDetail } from './components/cards/CardModals';
-import { CouponBrowser } from './components/coupons/CouponBrowser';
-import { WeeklyAdBrowser } from './components/coupons/WeeklyAdBrowser';
+import { CouponHub } from './components/coupons/CouponHub';
 import { NotificationCenter, NotificationBell } from './components/coupons/NotificationCenter';
 import { ShoppingListManager } from './components/shopping/ShoppingListManager';
 import { MealPlanner } from './components/meals/MealPlanner';
@@ -17,8 +15,9 @@ import { PantryTracker } from './components/shopping/PantryTracker';
 import { BudgetDashboard } from './components/budget/BudgetDashboard';
 import { PriceIntelligence } from './components/budget/PriceIntelligence';
 import { CheckoutMode } from './components/checkout/CheckoutMode';
+import { UpdatePrompt } from './components/UpdatePrompt';
 import { IconHome, IconList, IconTag, IconWallet, IconUser, IconPlus, IconCalendar, IconBarcode, IconRefresh, IconBell, IconChart, IconLocation } from './components/Icons';
-import type { LoyaltyCard, DietaryProfile, AppNotification } from './lib/types';
+import type { LoyaltyCard, DietaryProfile, AppNotification, ManualCoupon } from './lib/types';
 import type { ShoppingList, PantryItem } from './data/shopping';
 import type { BudgetConfig, PurchaseRecord } from './data/budget';
 import { DEFAULT_BUDGET, calculateSpendingSummary, formatCurrency, getDaysRemaining, formatPeriodLabel, createPurchaseFromCheckout, ESTIMATED_CATEGORY_PRICES } from './data/budget';
@@ -33,13 +32,13 @@ export default function App() {
   const [cards, setCards, cardsLoaded] = useStorage<LoyaltyCard[]>('ck:cards', []);
   const [profile, setProfile, profileLoaded] = useStorage<DietaryProfile>('ck:profile', { diet: '', allergens: [], customExclusions: '' });
   const [onboarded, setOnboarded, onbLoaded] = useStorage<boolean>('ck:onboarded', false);
-  const [clippedIds, setClippedIds, clippedLoaded] = useStorage<string[]>('ck:clipped', []);
+  const [manualCoupons, setManualCoupons, couponsLoaded] = useStorage<ManualCoupon[]>('ck:manualCoupons', []);
   const [notifications, setNotifications, notifsLoaded] = useStorage<AppNotification[]>('ck:notifs', MOCK_NOTIFICATIONS);
   const [shoppingLists, setShoppingLists, listsLoaded] = useStorage<ShoppingList[]>('ck:lists', []);
   const [pantryItems, setPantryItems, pantryLoaded] = useStorage<PantryItem[]>('ck:pantry', []);
   const [budgetConfig, setBudgetConfig, budgetLoaded] = useStorage<BudgetConfig>('ck:budget', DEFAULT_BUDGET);
   const [purchases, setPurchases, purchasesLoaded] = useStorage<PurchaseRecord[]>('ck:purchases', []);
-  const [theme, setTheme, themeLoaded] = useStorage<ThemeMode>('ck:theme', 'system');
+  const [theme, setTheme, themeLoaded] = useStorage<ThemeMode>('ck:theme', 'light');
   const [pendingTrip, setPendingTrip, pendingTripLoaded] = useStorage<{ listId: string; storeName: string; checkedAt: string } | null>('ck:pendingTrip', null);
 
   // ─── Local State ───
@@ -48,18 +47,23 @@ export default function App() {
   const [selectedCard, setSelectedCard] = useState<LoyaltyCard | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
-  const [couponSubTab, setCouponSubTab] = useState<'coupons' | 'ads'>('coupons');
   const [listsSubTab, setListsSubTab] = useState<'lists' | 'meals' | 'pantry'>('lists');
   const [budgetSubTab, setBudgetSubTab] = useState<'budget' | 'prices'>('budget');
 
   // ─── Geolocation ───
   const geo = useGeolocation();
-  const loaded = cardsLoaded && profileLoaded && onbLoaded && clippedLoaded && notifsLoaded && listsLoaded && pantryLoaded && budgetLoaded && purchasesLoaded && themeLoaded && pendingTripLoaded;
+  const loaded = cardsLoaded && profileLoaded && onbLoaded && couponsLoaded && notifsLoaded && listsLoaded && pantryLoaded && budgetLoaded && purchasesLoaded && themeLoaded && pendingTripLoaded;
 
   useEffect(() => { if (onboarded && loaded) geo.detect(); }, [onboarded, loaded]);
 
   // ─── Dark Mode ───
   useEffect(() => {
+    // Migrate existing users from 'system' default to 'light' (v1.0.0 fix)
+    if (!localStorage.getItem('ck:theme_migrated')) {
+      localStorage.setItem('ck:theme_migrated', '1');
+      if (theme === 'system') setTheme('light');
+    }
+
     const root = document.documentElement;
     if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       root.classList.add('dark');
@@ -79,24 +83,22 @@ export default function App() {
   const nearbyStoreInfo = geo.nearbyStore;
   const nearbyCard = nearbyStoreId ? cards.find((c) => c.storeId === nearbyStoreId) : null;
   const unreadNotifs = notifications.filter((n) => !n.read).length;
-
-  const storeAvailableCoupons = useMemo(() => {
-    if (!nearbyStoreId) return 0;
-    let coupons = filterCouponsByStore(MOCK_COUPONS, nearbyStoreId);
-    if (profile.diet || profile.allergens.length > 0) {
-      coupons = filterCouponsByDiet(coupons, profile.diet, profile.allergens, DIET_EXCLUSIONS);
-    }
-    return coupons.length;
-  }, [nearbyStoreId, profile]);
+  const activeCouponCount = manualCoupons.filter((c) => !c.used && (!c.expiresAt || new Date(c.expiresAt) >= new Date())).length;
 
   // ─── Pending Trip Tracking ───
   useEffect(() => {
-    if (!loaded || !nearbyStoreId || !nearbyStoreInfo) return;
+    if (!loaded) return;
+    // Auto-expire pending trips older than 24 hours
+    if (pendingTrip && Date.now() - new Date(pendingTrip.checkedAt).getTime() > 24 * 60 * 60 * 1000) {
+      setPendingTrip(null);
+      return;
+    }
+    if (!nearbyStoreId || !nearbyStoreInfo) return;
     const listWithChecked = shoppingLists.find((l) => l.items.length > 0 && l.items.every((i) => i.checked));
     if (listWithChecked && !pendingTrip) {
       setPendingTrip({ listId: listWithChecked.id, storeName: nearbyStoreInfo.name, checkedAt: new Date().toISOString() });
     }
-  }, [shoppingLists, nearbyStoreId]);
+  }, [shoppingLists, nearbyStoreId, pendingTrip, loaded]);
 
   // ─── Handlers ───
   const handleOnboardingComplete = (card: LoyaltyCard | null, diet: string, allergens: string[]) => {
@@ -107,8 +109,9 @@ export default function App() {
 
   const addCard = (card: LoyaltyCard) => { setCards((p) => [...p, card]); setShowAddCard(false); };
   const deleteCard = (id: string) => { setCards((p) => p.filter((c) => c.id !== id)); setSelectedCard(null); };
-  const clipCoupon = (id: string) => setClippedIds((p) => p.includes(id) ? p : [...p, id]);
-  const unclipCoupon = (id: string) => setClippedIds((p) => p.filter((c) => c !== id));
+  const addManualCoupon = (c: ManualCoupon) => setManualCoupons((p) => [...p, c]);
+  const deleteManualCoupon = (id: string) => setManualCoupons((p) => p.filter((c) => c.id !== id));
+  const markCouponUsed = (id: string) => setManualCoupons((p) => p.map((c) => c.id === id ? { ...c, used: true } : c));
   const markNotifRead = (id: string) => setNotifications((p) => p.map((n) => n.id === id ? { ...n, read: true } : n));
   const markAllNotifsRead = () => setNotifications((p) => p.map((n) => ({ ...n, read: true })));
   const addPurchase = (p: PurchaseRecord) => setPurchases((prev) => [p, ...prev]);
@@ -150,8 +153,8 @@ export default function App() {
       <div className="mx-4 mt-4 p-3.5 rounded-xl flex items-center gap-3 card-surface transition-all" style={{
         borderColor: nearbyStoreId ? nearbyStoreInfo!.color + '30' : undefined,
       }}>
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg flex-shrink-0" style={{ background: nearbyStoreId ? nearbyStoreInfo!.color + '12' : '#F4F3ED' }}>
-          {nearbyStoreId ? nearbyStoreInfo!.icon : '📍'}
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: nearbyStoreId ? nearbyStoreInfo!.color + '12' : '#F4F3ED' }}>
+          {nearbyStoreId ? <span className="text-lg">{nearbyStoreInfo!.icon}</span> : <IconLocation size={18} className="text-forest-900/55" />}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: nearbyStoreId ? nearbyStoreInfo!.color : '#9CA396' }}>
@@ -221,25 +224,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Coupons preview */}
-      {nearbyStoreId && storeAvailableCoupons > 0 && (
-        <div className="mx-4 mt-4 animate-fade-in">
-          <button onClick={() => { setTab('coupons'); setCouponSubTab('coupons'); }}
-            className="w-full p-4 rounded-2xl border border-forest-500/20 bg-forest-50/30 text-left active:scale-[0.98] transition-transform">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-forest-600 flex items-center justify-center"><IconTag size={18} className="text-white" /></div>
-                <div>
-                  <p className="text-sm font-bold text-forest-600">{storeAvailableCoupons} coupons available</p>
-                  <p className="text-[11px] text-gray-400">At {nearbyStoreInfo!.name} · diet-filtered</p>
-                </div>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-            </div>
-          </button>
-        </div>
-      )}
-
       {/* Budget widget */}
       <button onClick={() => setTab('budget')}
         className="mx-4 mt-4 p-4 rounded-2xl text-left active:scale-[0.98] transition-transform"
@@ -279,10 +263,10 @@ export default function App() {
             <p className="text-sm font-bold mt-1.5 text-forest-900">Meal Planner</p>
             <p className="text-[11px] text-forest-900/60">Plan & generate lists</p>
           </button>
-          <button onClick={() => { setTab('coupons'); setCouponSubTab('coupons'); }} className="p-4 rounded-xl card-surface text-left active:scale-[0.97] transition-transform min-h-[80px]">
+          <button onClick={() => setTab('coupons')} className="p-4 rounded-xl card-surface text-left active:scale-[0.97] transition-transform min-h-[80px]">
             <div className="w-8 h-8 rounded-lg bg-forest-100 flex items-center justify-center"><IconTag size={16} className="text-forest-600" /></div>
             <p className="text-sm font-bold mt-1.5 text-forest-900">Coupons</p>
-            <p className="text-[11px] text-forest-900/60">{clippedIds.length} clipped</p>
+            <p className="text-[11px] text-forest-900/60">{activeCouponCount} saved</p>
           </button>
           <button onClick={() => setTab('budget')} className="p-4 rounded-xl card-surface text-left active:scale-[0.97] transition-transform min-h-[80px]">
             <div className="w-8 h-8 rounded-lg bg-brass-50 flex items-center justify-center"><IconWallet size={16} className="text-brass-600" /></div>
@@ -350,78 +334,9 @@ export default function App() {
     </div>
   );
 
-  const CouponsScreen = () => {
-    const [storeSelector, setStoreSelector] = useState(false);
-    const [selectedStoreId, setSelectedStoreId] = useState<string | null>(nearbyStoreId);
-    const activeStoreId = selectedStoreId || nearbyStoreId;
-    const activeStore = activeStoreId ? getStore(activeStoreId) : null;
-
-    return (
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Sub-tabs */}
-        <div className="px-4 pt-3">
-          <div className="flex gap-1 p-1 rounded-xl bg-gray-100">
-            <button onClick={() => setCouponSubTab('coupons')}
-              className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
-              style={{ background: couponSubTab === 'coupons' ? 'white' : 'transparent', color: couponSubTab === 'coupons' ? '#1B4332' : '#6B7280', boxShadow: couponSubTab === 'coupons' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-              Coupons
-            </button>
-            <button onClick={() => setCouponSubTab('ads')}
-              className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
-              style={{ background: couponSubTab === 'ads' ? 'white' : 'transparent', color: couponSubTab === 'ads' ? '#1B4332' : '#6B7280', boxShadow: couponSubTab === 'ads' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-              Weekly Ads
-            </button>
-          </div>
-
-          {/* Store selector for ads */}
-          {couponSubTab === 'ads' && (
-            <div className="mt-3">
-              <button onClick={() => setStoreSelector(!storeSelector)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white w-full text-left">
-                {activeStore ? (
-                  <>
-                    <span>{activeStore.icon}</span>
-                    <span className="text-sm font-semibold text-gray-700">{activeStore.name}</span>
-                  </>
-                ) : (
-                  <span className="text-sm text-gray-400">Select a store...</span>
-                )}
-                <svg className="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
-              </button>
-              {storeSelector && (
-                <div className="mt-1 p-2 rounded-xl border border-gray-200 bg-white shadow-lg max-h-48 overflow-y-auto">
-                  {STORES.filter((s) => s.id !== 'other').map((s) => (
-                    <button key={s.id} onClick={() => { setSelectedStoreId(s.id); setStoreSelector(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left hover:bg-gray-50 transition-colors">
-                      <span>{s.icon}</span>
-                      <span className="text-sm text-gray-700">{s.name}</span>
-                      {nearbyStoreId === s.id && <span className="ml-auto text-[10px] text-green-500 font-bold">NEARBY</span>}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Content */}
-        {couponSubTab === 'coupons' ? (
-          <CouponBrowser nearbyStoreId={nearbyStoreId} profile={profile} clippedIds={clippedIds} onClip={clipCoupon} onUnclip={unclipCoupon} />
-        ) : activeStoreId && activeStore ? (
-          <div className="flex-1 overflow-y-auto px-4 pb-4 pt-3 scrollbar-hide">
-            <WeeklyAdBrowser storeId={activeStoreId} storeName={activeStore.name} storeColor={activeStore.color} profile={profile} />
-          </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              
-              <p className="text-sm text-gray-500">Select a store to view weekly ads</p>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
+  const CouponsScreen = () => (
+    <CouponHub cards={cards} manualCoupons={manualCoupons} onAddCoupon={addManualCoupon} onDeleteCoupon={deleteManualCoupon} onMarkUsed={markCouponUsed} />
+  );
 
   const ProfileScreen = () => {
     const [localDiet, setLocalDiet] = useState(profile.diet);
@@ -526,7 +441,7 @@ export default function App() {
             <p className="text-xs mt-0.5 text-forest-900/55">CartKey v1.0.0 · MIT License · grocery.blackatlas.tech</p>
           </div>
 
-          <button onClick={() => { if (confirm('Reset all data? This cannot be undone.')) { setCards([]); setProfile({ diet: '', allergens: [], customExclusions: '' }); setClippedIds([]); setNotifications(MOCK_NOTIFICATIONS); setShoppingLists([]); setPantryItems([]); setBudgetConfig(DEFAULT_BUDGET); setPurchases([]); setPendingTrip(null); setTheme('system'); setOnboarded(false); } }}
+          <button onClick={() => { if (confirm('Reset all data? This cannot be undone.')) { setCards([]); setProfile({ diet: '', allergens: [], customExclusions: '' }); setManualCoupons([]); setNotifications(MOCK_NOTIFICATIONS); setShoppingLists([]); setPantryItems([]); setBudgetConfig(DEFAULT_BUDGET); setPurchases([]); setPendingTrip(null); setTheme('light'); setOnboarded(false); } }}
             className="w-full p-3 rounded-xl border border-red-200 bg-red-50 text-left">
             <p className="text-sm font-semibold text-red-600">Reset All Data</p>
           </button>
@@ -559,7 +474,7 @@ export default function App() {
             </button>
           </div>
         </div>
-        {listsSubTab === 'lists' && <ShoppingListManager lists={shoppingLists} onUpdateLists={setShoppingLists} clippedIds={clippedIds} onClip={clipCoupon} onFinishTrip={nearbyCard ? () => setShowCheckout(true) : undefined} />}
+        {listsSubTab === 'lists' && <ShoppingListManager lists={shoppingLists} onUpdateLists={setShoppingLists} onFinishTrip={nearbyCard ? () => setShowCheckout(true) : undefined} />}
         {listsSubTab === 'meals' && <MealPlanner pantryItems={pantryItems} onGenerateList={handleGenerateList} />}
         {listsSubTab === 'pantry' && <PantryTracker items={pantryItems} onUpdate={setPantryItems} />}
       </div>
@@ -618,7 +533,7 @@ export default function App() {
             </div>
           </div>
           {budgetSubTab === 'budget' && <BudgetDashboard budget={budgetConfig} purchases={purchases} onUpdateBudget={setBudgetConfig} onAddPurchase={addPurchase} />}
-          {budgetSubTab === 'prices' && <PriceIntelligence purchases={purchases} coupons={MOCK_COUPONS} clippedIds={clippedIds} onClip={clipCoupon} />}
+          {budgetSubTab === 'prices' && <PriceIntelligence purchases={purchases} coupons={[]} clippedIds={[]} onClip={() => {}} />}
         </div>
       )}
       {tab === 'profile' && <ProfileScreen />}
@@ -648,14 +563,18 @@ export default function App() {
       {showCheckout && nearbyCard && (
         <CheckoutMode
           card={nearbyCard}
-          clippedIds={clippedIds}
+          manualCoupons={manualCoupons}
           budgetRemaining={budgetSummary.remaining}
           budgetPeriodLabel={formatPeriodLabel(budgetConfig.period)}
           activeList={shoppingLists.find((l) => l.items.some((i) => i.checked)) || null}
           onComplete={(purchase) => { if (purchase) addPurchase(purchase); setPendingTrip(null); setShowCheckout(false); }}
+          onMarkCouponUsed={markCouponUsed}
           onClose={() => setShowCheckout(false)}
         />
       )}
+
+      {/* Service worker update prompt */}
+      <UpdatePrompt />
     </div>
   );
 }

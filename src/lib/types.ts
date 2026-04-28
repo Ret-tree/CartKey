@@ -61,6 +61,18 @@ export interface Coupon {
   downvotes: number;
 }
 
+// ─── Manual Coupon (user-entered) ───
+export interface ManualCoupon {
+  id: string;
+  storeId: string;
+  description: string;
+  discountAmount: string;  // free-text: "$1 off", "BOGO", etc.
+  barcode?: string;
+  expiresAt?: string;      // ISO date
+  addedAt: string;
+  used: boolean;
+}
+
 // ─── Weekly Ad Types ───
 export interface WeeklyAdItem {
   id: string;

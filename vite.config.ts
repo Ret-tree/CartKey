@@ -7,20 +7,21 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['icons/*.png'],
       manifest: {
         name: 'CartKey',
         short_name: 'CartKey',
-        description: 'Every card. Every coupon. One app.',
-        theme_color: '#1B4332',
-        background_color: '#FEFAE0',
+        description: 'Every loyalty card and coupon, in one place at the register.',
+        theme_color: '#1A1F16',
+        background_color: '#FAFAF5',
         display: 'standalone',
         scope: '/',
         start_url: '/',
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {

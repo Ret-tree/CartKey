@@ -16,10 +16,49 @@
   }
 
   /* Dark mode base */
-  html.dark body { background: #1A1F16; color: #E8E7DF; }
+  html.dark body { background: #1A1F16; color: #D5D4CC; }
   html.dark .card-surface { background: #242920; border-color: #333D2D; }
-  html.dark input, html.dark select { background: #242920; border-color: #333D2D; color: #E8E7DF; }
-  html.dark input::placeholder { color: #5C6356; }
+  html.dark input, html.dark select, html.dark textarea { background: #242920; border-color: #333D2D; color: #D5D4CC; }
+  html.dark input::placeholder { color: #6B7260; }
+
+  /* Dark mode — text overrides */
+  html.dark [class*="text-forest-900"] { color: #D5D4CC; }
+  html.dark [class*="text-forest-600"] { color: #7DB89B; }
+  html.dark [class*="text-forest-500"] { color: #7DB89B; }
+  html.dark .text-forest-900\/50 { color: rgba(213,212,204,0.6) !important; }
+  html.dark .text-forest-900\/55 { color: rgba(213,212,204,0.65) !important; }
+  html.dark .text-forest-900\/60 { color: rgba(213,212,204,0.7) !important; }
+  html.dark .text-forest-900\/70 { color: rgba(213,212,204,0.8) !important; }
+
+  /* Dark mode — backgrounds */
+  html.dark [class*="bg-warm-50"] { background-color: #1A1F16; }
+  html.dark [class*="bg-warm-100"] { background-color: #242920; }
+  html.dark [class*="bg-warm-200"] { background-color: #333D2D; }
+  html.dark [class*="bg-white"] { background-color: #242920; }
+  html.dark [class*="bg-gray-100"] { background-color: #2A3025; }
+  html.dark [class*="bg-green-50"] { background-color: #1A2E1A; }
+  html.dark [class*="bg-amber-50"] { background-color: #2E2A1A; }
+  html.dark [class*="bg-red-50"] { background-color: #2E1A1A; }
+  html.dark [class*="bg-brass-50"] { background-color: #2A2818; }
+  html.dark [class*="bg-forest-100"] { background-color: #1E2B22; }
+
+  /* Dark mode — borders */
+  html.dark [class*="border-warm-200"] { border-color: #333D2D; }
+  html.dark [class*="border-gray-100"] { border-color: #333D2D; }
+  html.dark [class*="border-gray-200"] { border-color: #333D2D; }
+  html.dark [class*="border-green-200"] { border-color: #2A4A2A; }
+  html.dark [class*="border-amber-200"] { border-color: #4A3A1A; }
+  html.dark [class*="border-brass-200"] { border-color: #4A3A1A; }
+
+  /* Dark mode — specific overrides for gray text used in sub-components */
+  html.dark [class*="text-gray-400"] { color: #8A8E80; }
+  html.dark [class*="text-gray-500"] { color: #9CA396; }
+  html.dark [class*="text-gray-600"] { color: #A8ADA0; }
+  html.dark [class*="text-gray-700"] { color: #C0C4B8; }
+  html.dark [class*="text-gray-800"] { color: #D5D4CC; }
+
+  /* Dark mode — barcode always on white */
+  html.dark .barcode-container { background: white !important; }
 
   /* Prevent iOS input zoom - ensure all inputs are 16px+ */
   input, select, textarea { font-size: 16px !important; }

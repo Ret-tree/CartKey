@@ -43,10 +43,15 @@ export function useGeolocation() {
           coords: { lat: latitude, lng: longitude },
         });
       },
-      () => {
-        setState((s) => ({ ...s, status: 'denied' }));
+      (err) => {
+        // PERMISSION_DENIED=1, POSITION_UNAVAILABLE=2, TIMEOUT=3
+        if (err.code === 1) {
+          setState((s) => ({ ...s, status: 'denied' }));
+        } else {
+          setState((s) => ({ ...s, status: 'none_nearby' }));
+        }
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   }, []);
 

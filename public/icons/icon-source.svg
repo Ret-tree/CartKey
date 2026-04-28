@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- iOS recommends ~10% inset from edges; this fills the canvas with a rounded square,
+       letting the system mask round it for non-iOS launchers -->
+
+  <!-- Background: deep forest with subtle vertical gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1F2A1C"/>
+      <stop offset="100%" stop-color="#0F1A0E"/>
+    </linearGradient>
+
+    <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8D48A"/>
+      <stop offset="40%" stop-color="#C9A227"/>
+      <stop offset="100%" stop-color="#8B6F18"/>
+    </linearGradient>
+
+    <linearGradient id="brassHighlight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FBF6E6" stop-opacity="0.5"/>
+      <stop offset="50%" stop-color="#FBF6E6" stop-opacity="0"/>
+    </linearGradient>
+
+    <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.35"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Full bleed background -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#vignette)"/>
+
+  <!-- Subtle radial brass glow behind logo -->
+  <circle cx="512" cy="500" r="320" fill="#C9A227" opacity="0.06"/>
+  <circle cx="512" cy="500" r="220" fill="#C9A227" opacity="0.08"/>
+
+  <!-- Hexagonal key mark — scaled & centered -->
+  <!-- Hexagon outer ring -->
+  <g transform="translate(512, 500)">
+    <!-- Hexagon outline -->
+    <path d="M 0 -260 L 225 -130 L 225 130 L 0 260 L -225 130 L -225 -130 Z"
+          fill="none" stroke="url(#brass)" stroke-width="20" stroke-linejoin="round"/>
+
+    <!-- Inner hexagon shadow line for depth -->
+    <path d="M 0 -240 L 207 -120 L 207 120 L 0 240 L -207 120 L -207 -120 Z"
+          fill="none" stroke="#0A0F08" stroke-width="3" opacity="0.4" stroke-linejoin="round"/>
+
+    <!-- Key bow (the round hole part) -->
+    <circle cx="0" cy="-50" r="60" fill="none" stroke="url(#brass)" stroke-width="22"/>
+    <circle cx="0" cy="-50" r="38" fill="#0F1A0E"/>
+
+    <!-- Key shaft -->
+    <rect x="-14" y="10" width="28" height="180" fill="url(#brass)" rx="4"/>
+
+    <!-- Key teeth -->
+    <rect x="14" y="120" width="40" height="22" fill="url(#brass)" rx="2"/>
+    <rect x="14" y="155" width="28" height="22" fill="url(#brass)" rx="2"/>
+
+    <!-- Highlight gleam on key bow -->
+    <path d="M -45 -75 A 60 60 0 0 1 -10 -105"
+          fill="none" stroke="#FBF6E6" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+  </g>
+
+  <!-- Brass accent stripe at top, echoing the app header -->
+  <rect x="0" y="0" width="1024" height="6" fill="url(#brass)" opacity="0.5"/>
+</svg>

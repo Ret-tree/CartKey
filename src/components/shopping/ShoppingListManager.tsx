@@ -1,27 +1,21 @@
 import { useState, useMemo } from 'react';
 import type { ShoppingList, ShoppingItem } from '../../data/shopping';
-import { autoCategory, matchItemToCoupons, GROCERY_CATEGORIES, UNITS } from '../../data/shopping';
+import { autoCategory, GROCERY_CATEGORIES, UNITS } from '../../data/shopping';
 import { generateId } from '../../lib/geo';
-import { MOCK_COUPONS, formatDiscount } from '../../data/coupons';
-import type { Coupon } from '../../lib/types';
 
 interface Props {
   lists: ShoppingList[];
   onUpdateLists: (lists: ShoppingList[]) => void;
-  clippedIds: string[];
-  onClip: (id: string) => void;
   onFinishTrip?: () => void;
 }
 
-export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, onFinishTrip }: Props) {
+export function ShoppingListManager({ lists, onUpdateLists, onFinishTrip }: Props) {
   const [activeListId, setActiveListId] = useState<string | null>(lists[0]?.id ?? null);
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [newItemText, setNewItemText] = useState('');
-  const [showMatches, setShowMatches] = useState<string | null>(null);
 
   const activeList = lists.find((l) => l.id === activeListId);
-  const activeCoupons = useMemo(() => MOCK_COUPONS.filter((c) => new Date(c.validUntil) >= new Date()), []);
 
   const createList = () => {
     if (!newListName.trim()) return;
@@ -41,10 +35,9 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
   const addItem = () => {
     if (!newItemText.trim() || !activeList) return;
     const cat = autoCategory(newItemText);
-    const matches = matchItemToCoupons(newItemText, activeCoupons);
     const item: ShoppingItem = {
       id: generateId(), name: newItemText.trim(), quantity: 1, unit: '',
-      category: cat, checked: false, dietaryTags: [], matchedCouponIds: matches,
+      category: cat, checked: false, dietaryTags: [], matchedCouponIds: [],
     };
     updateList({ ...activeList, items: [...activeList.items, item] });
     setNewItemText('');
@@ -80,20 +73,6 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
   }, [activeList]);
 
   const uncheckedCount = activeList?.items.filter((i) => !i.checked).length ?? 0;
-  const totalMatches = activeList?.items.reduce((sum, i) => sum + i.matchedCouponIds.length, 0) ?? 0;
-
-  const estimatedSavings = useMemo(() => {
-    if (!activeList) return 0;
-    const couponMap = new Map(activeCoupons.map((c) => [c.id, c]));
-    let total = 0;
-    for (const item of activeList.items) {
-      for (const cid of item.matchedCouponIds) {
-        const c = couponMap.get(cid);
-        if (c && c.discountType === 'fixed') total += c.discountValue;
-      }
-    }
-    return total;
-  }, [activeList, activeCoupons]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -120,16 +99,6 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
           {/* Stats bar */}
           <div className="flex items-center gap-3 mb-3 text-[11px]">
             <span className="text-gray-400">{uncheckedCount} items left</span>
-            {totalMatches > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-semibold">
-                {totalMatches} coupon{totalMatches > 1 ? 's' : ''} matched
-              </span>
-            )}
-            {estimatedSavings > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-semibold">
-                ~${estimatedSavings.toFixed(2)} savings
-              </span>
-            )}
           </div>
 
           {/* Add item */}
@@ -164,31 +133,6 @@ export function ShoppingListManager({ lists, onUpdateLists, clippedIds, onClip, 
                       </button>
                       <div className="flex-1 min-w-0">
                         <p className={`text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>{item.name}</p>
-                        {item.matchedCouponIds.length > 0 && !item.checked && (
-                          <button onClick={() => setShowMatches(showMatches === item.id ? null : item.id)}
-                            className="text-[10px] text-green-600 font-semibold mt-0.5">
-                            {item.matchedCouponIds.length} coupon{item.matchedCouponIds.length > 1 ? 's' : ''} available
-                          </button>
-                        )}
-                        {showMatches === item.id && (
-                          <div className="mt-1 space-y-1">
-                            {item.matchedCouponIds.map((cid) => {
-                              const c = activeCoupons.find((x) => x.id === cid);
-                              if (!c) return null;
-                              const clipped = clippedIds.includes(cid);
-                              return (
-                                <div key={cid} className="flex items-center gap-2 px-2 py-1 rounded-lg bg-green-50">
-                                  <span className="text-[10px] font-bold text-green-700">{formatDiscount(c)}</span>
-                                  <span className="text-[10px] text-green-600 flex-1 truncate">{c.productName}</span>
-                                  <button onClick={() => onClip(cid)} className="text-[10px] font-bold"
-                                    style={{ color: clipped ? '#9CA3AF' : '#059669' }}>
-                                    {clipped ? '✅' : '✂️ Clip'}
-                                  </button>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
                       </div>
                       <div className="flex items-center gap-1">
                         <button onClick={() => updateItemQty(item.id, item.quantity - 1)} className="w-6 h-6 rounded text-xs text-gray-400 bg-gray-100">−</button>

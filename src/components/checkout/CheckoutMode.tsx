@@ -1,37 +1,35 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { BarcodeDisplay } from '../cards/BarcodeDisplay';
 import { formatCardDisplay } from '../../lib/cardValidation';
 import { formatCurrency, ESTIMATED_CATEGORY_PRICES, createPurchaseFromCheckout } from '../../data/budget';
-import { MOCK_COUPONS, formatDiscount, isExpired } from '../../data/coupons';
 import { getStore } from '../../data/stores';
-import type { LoyaltyCard } from '../../lib/types';
-import type { Coupon } from '../../lib/types';
-import type { PurchaseRecord, BudgetConfig } from '../../data/budget';
+import type { LoyaltyCard, ManualCoupon } from '../../lib/types';
+import type { PurchaseRecord } from '../../data/budget';
 import type { ShoppingList } from '../../data/shopping';
 
 interface Props {
   card: LoyaltyCard;
-  clippedIds: string[];
+  manualCoupons: ManualCoupon[];
   budgetRemaining: number;
   budgetPeriodLabel: string;
   activeList: ShoppingList | null;
   onComplete: (purchase: PurchaseRecord | null) => void;
+  onMarkCouponUsed: (id: string) => void;
   onClose: () => void;
 }
 
 type Stage = 'card' | 'coupons' | 'done';
 
-export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLabel, activeList, onComplete, onClose }: Props) {
+export function CheckoutMode({ card, manualCoupons, budgetRemaining, budgetPeriodLabel, activeList, onComplete, onMarkCouponUsed, onClose }: Props) {
   const [stage, setStage] = useState<Stage>('card');
   const [couponIdx, setCouponIdx] = useState(0);
-  const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);
   const [logTrip, setLogTrip] = useState(true);
   const [showPhone, setShowPhone] = useState(false);
   const storeData = getStore(card.storeId);
 
-  // Get active clipped coupons for this store
-  const activeCoupons = MOCK_COUPONS.filter(
-    (c) => clippedIds.includes(c.id) && !isExpired(c) && c.retailerIds.includes(card.storeId) && c.barcode
+  // Get active manual coupons with barcodes for this store
+  const activeCoupons = manualCoupons.filter(
+    (c) => !c.used && c.barcode && c.storeId === card.storeId && (!c.expiresAt || new Date(c.expiresAt) >= new Date())
   );
 
   // Screen Wake Lock — keep screen on during checkout
@@ -41,11 +39,10 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
       try {
         if ('wakeLock' in navigator) {
           lock = await navigator.wakeLock.request('screen');
-          setWakeLock(lock);
         }
       } catch { /* wake lock not available */ }
     })();
-    return () => { lock?.release(); };
+    return () => { lock?.release().catch(() => {}); };
   }, []);
 
   // Request max brightness via CSS (works on some mobile browsers)
@@ -68,6 +65,9 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
   };
 
   const handleDone = () => {
+    // Mark presented coupons as used
+    activeCoupons.forEach((c) => onMarkCouponUsed(c.id));
+
     if (logTrip && activeList) {
       const checkedItems = activeList.items
         .filter((i) => i.checked)
@@ -179,18 +179,15 @@ export function CheckoutMode({ card, clippedIds, budgetRemaining, budgetPeriodLa
           {/* Coupon card */}
           <div className="w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl shadow-black/30">
             {/* Discount banner */}
-            <div className="py-3 px-4 text-center" style={{ background: activeCoupons[couponIdx].discountType === 'freebie' ? '#7C3AED' : '#1B4332' }}>
-              <p className="text-white font-bold text-lg">{formatDiscount(activeCoupons[couponIdx])}</p>
-              <p className="text-white/80 text-xs mt-0.5">{activeCoupons[couponIdx].productName}</p>
+            <div className="py-3 px-4 text-center bg-forest-900">
+              <p className="text-white font-bold text-lg">{activeCoupons[couponIdx].discountAmount}</p>
+              <p className="text-white/80 text-xs mt-0.5">{activeCoupons[couponIdx].description}</p>
             </div>
 
             {/* Barcode */}
             <div className="p-6">
               <p className="text-[10px] uppercase tracking-widest text-center mb-4 font-semibold text-forest-900/60">Scan Coupon</p>
               <BarcodeDisplay value={activeCoupons[couponIdx].barcode!} height={80} />
-              {activeCoupons[couponIdx].description && (
-                <p className="text-xs text-center text-forest-900/55 mt-3">{activeCoupons[couponIdx].description}</p>
-              )}
             </div>
           </div>
 

@@ -1,9 +1,8 @@
 import { useState, useMemo } from 'react';
 import { SAMPLE_RECIPES } from '../../data/recipes';
 import type { Recipe, ShoppingList, ShoppingItem, PantryItem } from '../../data/shopping';
-import { aggregateIngredients, autoCategory, matchItemToCoupons } from '../../data/shopping';
+import { aggregateIngredients, autoCategory } from '../../data/shopping';
 import { generateId } from '../../lib/geo';
-import { MOCK_COUPONS } from '../../data/coupons';
 
 type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 interface PlannedMeal { day: number; slot: MealSlot; recipeId: string; }
@@ -27,7 +26,6 @@ export function MealPlanner({ pantryItems, onGenerateList }: Props) {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   const recipes = SAMPLE_RECIPES;
-  const activeCoupons = useMemo(() => MOCK_COUPONS.filter((c) => new Date(c.validUntil) >= new Date()), []);
 
   const filteredRecipes = useMemo(() => {
     if (!recipeSearch) return recipes;
@@ -68,7 +66,7 @@ export function MealPlanner({ pantryItems, onGenerateList }: Props) {
     const items: ShoppingItem[] = needed.map((ing) => ({
       id: generateId(), name: ing.name, quantity: ing.quantity, unit: ing.unit,
       category: ing.category || autoCategory(ing.name), checked: false,
-      dietaryTags: [], matchedCouponIds: matchItemToCoupons(ing.name, activeCoupons),
+      dietaryTags: [], matchedCouponIds: [],
     }));
 
     const list: ShoppingList = {

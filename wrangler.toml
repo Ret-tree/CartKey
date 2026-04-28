@@ -5,12 +5,12 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "cartkey-db"
-database_id = "754dbf02-e0f6-4aec-8b12-3e245b8fbbee"
+database_id = "" # Set after running: wrangler d1 create cartkey-db
 
 [[kv_namespaces]]
 binding = "COUPON_CACHE"
-id = "1ba62d04fbf046f99e5e0348440675cc"
+id = "" # Set after running: wrangler kv:namespace create COUPON_CACHE
 
 [[r2_buckets]]
-binding = "STORAGE"
-bucket_name = "cartkey-storage"
+binding = "ASSETS"
+bucket_name = "cartkey-assets"
