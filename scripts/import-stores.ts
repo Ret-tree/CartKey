@@ -37,6 +37,22 @@ const BRAND_MAP: Record<string, string> = {
   'giant food': 'giantfood',
   'giant': 'giantfood',
   'lidl': 'lidl',
+  'sprouts': 'sprouts',
+  'sprouts farmers market': 'sprouts',
+  'lowes foods': 'lowesfoods',
+  "lowe's foods": 'lowesfoods',
+  'stop & shop': 'stopshop',
+  'stop and shop': 'stopshop',
+  'hannaford': 'hannaford',
+  'hannaford supermarkets': 'hannaford',
+  'hy-vee': 'hyvee',
+  'hyvee': 'hyvee',
+  'meijer': 'meijer',
+  'shoprite': 'shoprite',
+  'shop rite': 'shoprite',
+  'albertsons': 'albertsons',
+  'winn-dixie': 'winndixie',
+  'winn dixie': 'winndixie',
 };
 
 interface OverpassElement {

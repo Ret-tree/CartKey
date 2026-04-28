@@ -85,6 +85,43 @@ export const STORE_LOCATIONS: StoreLocation[] = [
   // ─── Publix ───
   { id: 'publix-fredericksburg-1', chainId: 'publix', name: 'Publix', address: '5305 Plank Rd, Fredericksburg, VA 22407', lat: 38.2781, lng: -77.5462 },
   { id: 'publix-stafford-1', chainId: 'publix', name: 'Publix', address: '285 Garrisonville Rd, Stafford, VA 22554', lat: 38.4749, lng: -77.4293 },
+
+  // ─── Sprouts ───
+  { id: 'sprouts-fairfax-1', chainId: 'sprouts', name: 'Sprouts Farmers Market', address: '11725 Lee Hwy, Fairfax, VA 22030', lat: 38.8615, lng: -77.3268 },
+  { id: 'sprouts-arlington-1', chainId: 'sprouts', name: 'Sprouts Farmers Market', address: '4053 Campbell Ave, Arlington, VA 22206', lat: 38.8434, lng: -77.0975 },
+  { id: 'sprouts-leesburg-1', chainId: 'sprouts', name: 'Sprouts Farmers Market', address: '521 Fort Evans Rd NE, Leesburg, VA 20176', lat: 39.1145, lng: -77.5379 },
+
+  // ─── Lowes Foods ───
+  { id: 'lowesfoods-mooresville-1', chainId: 'lowesfoods', name: 'Lowes Foods', address: '169 Talbert Pointe Dr, Mooresville, NC 28117', lat: 35.5841, lng: -80.8740 },
+  { id: 'lowesfoods-cary-1', chainId: 'lowesfoods', name: 'Lowes Foods', address: '4421 NW Cary Pkwy, Cary, NC 27513', lat: 35.8126, lng: -78.7836 },
+
+  // ─── Stop & Shop ───
+  { id: 'stopshop-quincy-1', chainId: 'stopshop', name: 'Stop & Shop', address: '65 Newport Ave, Quincy, MA 02171', lat: 42.2761, lng: -71.0226 },
+  { id: 'stopshop-stamford-1', chainId: 'stopshop', name: 'Stop & Shop', address: '777 Connecticut Ave, Norwalk, CT 06854', lat: 41.0974, lng: -73.4148 },
+
+  // ─── Hannaford ───
+  { id: 'hannaford-portland-1', chainId: 'hannaford', name: 'Hannaford', address: '295 Forest Ave, Portland, ME 04101', lat: 43.6691, lng: -70.2715 },
+  { id: 'hannaford-albany-1', chainId: 'hannaford', name: 'Hannaford', address: '900 Central Ave, Albany, NY 12206', lat: 42.6709, lng: -73.7935 },
+
+  // ─── Hy-Vee ───
+  { id: 'hyvee-desmoines-1', chainId: 'hyvee', name: 'Hy-Vee', address: '4605 Fleur Dr, Des Moines, IA 50321', lat: 41.5450, lng: -93.6604 },
+  { id: 'hyvee-omaha-1', chainId: 'hyvee', name: 'Hy-Vee', address: '7910 Cass St, Omaha, NE 68114', lat: 41.2683, lng: -96.0423 },
+
+  // ─── Meijer ───
+  { id: 'meijer-grandrapids-1', chainId: 'meijer', name: 'Meijer', address: '3434 Plainfield Ave NE, Grand Rapids, MI 49525', lat: 42.9933, lng: -85.6447 },
+  { id: 'meijer-detroit-1', chainId: 'meijer', name: 'Meijer', address: '37201 Warren Rd, Westland, MI 48185', lat: 42.3358, lng: -83.3935 },
+
+  // ─── ShopRite ───
+  { id: 'shoprite-paramus-1', chainId: 'shoprite', name: 'ShopRite', address: '224 Route 4 East, Paramus, NJ 07652', lat: 40.9223, lng: -74.0735 },
+  { id: 'shoprite-edison-1', chainId: 'shoprite', name: 'ShopRite', address: '274 Plainfield Rd, Edison, NJ 08817', lat: 40.5384, lng: -74.4002 },
+
+  // ─── Albertsons ───
+  { id: 'albertsons-boise-1', chainId: 'albertsons', name: 'Albertsons', address: '1650 Broadway Ave, Boise, ID 83706', lat: 43.5895, lng: -116.2074 },
+  { id: 'albertsons-portland-1', chainId: 'albertsons', name: 'Albertsons', address: '5415 SW Beaverton Hillsdale Hwy, Portland, OR 97221', lat: 45.4868, lng: -122.7251 },
+
+  // ─── Winn-Dixie ───
+  { id: 'winndixie-jacksonville-1', chainId: 'winndixie', name: 'Winn-Dixie', address: '5207 Normandy Blvd, Jacksonville, FL 32205', lat: 30.3104, lng: -81.7493 },
+  { id: 'winndixie-orlando-1', chainId: 'winndixie', name: 'Winn-Dixie', address: '6361 Old Winter Garden Rd, Orlando, FL 32835', lat: 28.5434, lng: -81.4582 },
 ];
 
 // ─── Lookup ───

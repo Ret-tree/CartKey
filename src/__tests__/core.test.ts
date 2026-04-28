@@ -271,10 +271,11 @@ describe('Store Database', () => {
   it('store locations have valid coordinates and chain references', () => {
     expect(STORE_LOCATIONS.length).toBeGreaterThan(30);
     STORE_LOCATIONS.forEach((loc) => {
-      expect(loc.lat).toBeGreaterThan(30);
-      expect(loc.lat).toBeLessThan(45);
-      expect(loc.lng).toBeLessThan(-70);
-      expect(loc.lng).toBeGreaterThan(-80);
+      // Continental US bounds (approximate)
+      expect(loc.lat).toBeGreaterThan(24);
+      expect(loc.lat).toBeLessThan(50);
+      expect(loc.lng).toBeLessThan(-66);
+      expect(loc.lng).toBeGreaterThan(-125);
       expect(loc.chainId).toBeTruthy();
       expect(loc.address).toBeTruthy();
       // Chain must exist in STORES

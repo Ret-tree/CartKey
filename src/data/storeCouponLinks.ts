@@ -25,6 +25,15 @@ export const STORE_COUPON_LINKS: StoreCouponLink[] = [
   { storeId: 'wholefds', name: 'Whole Foods Prime Deals', couponUrl: 'https://www.wholefoodsmarket.com/sales-flyer', description: 'Prime member deals and weekly sales' },
   { storeId: 'aldi', name: 'ALDI Weekly Specials', couponUrl: 'https://www.aldi.us/weekly-specials/', description: 'Browse this week\'s ALDI Finds' },
   { storeId: 'traderjoes', name: "Trader Joe's Fearless Flyer", couponUrl: 'https://www.traderjoes.com/home/discover/fearless-flyer', description: 'New and seasonal products' },
+  { storeId: 'sprouts', name: 'Sprouts Rewards Deals', couponUrl: 'https://www.sprouts.com/sprouts-rewards/', description: 'Personalized rewards and offers' },
+  { storeId: 'lowesfoods', name: 'Lowes Foods Fresh Rewards', couponUrl: 'https://www.lowesfoods.com/savings/coupons', description: 'Clip digital coupons to your Fresh Rewards' },
+  { storeId: 'stopshop', name: 'Stop & Shop GO Rewards', couponUrl: 'https://stopandshop.com/savings/coupons', description: 'Load digital coupons and earn points' },
+  { storeId: 'hannaford', name: 'Hannaford Rewards', couponUrl: 'https://www.hannaford.com/savings/digital-coupons', description: 'Clip digital coupons to your account' },
+  { storeId: 'hyvee', name: 'Hy-Vee Deals', couponUrl: 'https://www.hy-vee.com/deals/coupons', description: 'Browse and clip Hy-Vee coupons' },
+  { storeId: 'meijer', name: 'Meijer mPerks', couponUrl: 'https://www.meijer.com/mperks.html', description: 'Clip digital coupons and rewards' },
+  { storeId: 'shoprite', name: 'ShopRite Price Plus Club', couponUrl: 'https://www.shoprite.com/sm/pickup/rsid/3000/digital-coupons', description: 'Load digital coupons to your Price Plus Club' },
+  { storeId: 'albertsons', name: 'Albertsons for U', couponUrl: 'https://www.albertsons.com/foru/coupons-deals.html', description: 'Clip personalized for U coupons' },
+  { storeId: 'winndixie', name: 'Winn-Dixie Rewards', couponUrl: 'https://www.winndixie.com/savings/coupons', description: 'Load coupons to your Rewards account' },
 ];
 
 export function getStoreLinks(storeIds: string[]): StoreCouponLink[] {

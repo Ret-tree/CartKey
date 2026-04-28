@@ -27,6 +27,15 @@ const CARD_RULES: Record<string, CardFormatRule> = {
   foodlion: { storeId: 'foodlion', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'MVP card number', example: '0123456789' },
   giantfood: { storeId: 'giantfood', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Giant Card number', example: '0123456789' },
   lidl: { storeId: 'lidl', digitsOnly: false, minLength: 4, maxLength: 20, hint: 'Lidl Plus account ID', example: '5551234567' },
+  sprouts: { storeId: 'sprouts', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Sprouts Rewards member number', example: '0123456789' },
+  lowesfoods: { storeId: 'lowesfoods', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Fresh Rewards card number', example: '0123456789' },
+  stopshop: { storeId: 'stopshop', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Stop & Shop GO Rewards number', example: '0123456789' },
+  hannaford: { storeId: 'hannaford', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Hannaford Rewards number', example: '0123456789' },
+  hyvee: { storeId: 'hyvee', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Hy-Vee Plus member number', example: '0123456789' },
+  meijer: { storeId: 'meijer', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'mPerks member number', example: '0123456789' },
+  shoprite: { storeId: 'shoprite', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Price Plus Club number', example: '0123456789' },
+  albertsons: { storeId: 'albertsons', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Albertsons for U number', example: '0123456789' },
+  winndixie: { storeId: 'winndixie', digitsOnly: true, minLength: 10, maxLength: 13, hint: 'Winn-Dixie Rewards number', example: '0123456789' },
   other: { storeId: 'other', digitsOnly: false, minLength: 4, maxLength: 30, hint: 'Your loyalty card number', example: '1234567890' },
 };
 
